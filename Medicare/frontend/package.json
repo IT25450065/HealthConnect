@@ -1,0 +1,11 @@
+{
+  "name": "healthconnect-frontend",
+  "version": "1.0.0",
+  "description": "HealthConnect Integrated Healthcare Portal Frontend",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve ."
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
