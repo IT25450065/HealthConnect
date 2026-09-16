@@ -148,62 +148,80 @@ async function query(sql, params = []) {
 
 function parseAndExecuteMemoryQuery(sql, params) {
   const cleanSql = sql.trim().replace(/\s+/g, ' ');
+  const upperSql = cleanSql.toUpperCase();
 
   // SELECT queries
-  if (cleanSql.toUpperCase().startsWith('SELECT')) {
+  if (upperSql.startsWith('SELECT')) {
     // 1. Pharmacists by email
-    if (cleanSql.includes('FROM pharmacists WHERE email =')) {
+    if (upperSql.includes('FROM PHARMACISTS WHERE EMAIL =')) {
       const email = params[0];
       return memoryDb.pharmacists.filter(p => p.email.toLowerCase() === String(email).toLowerCase());
     }
     // 2. Pharmacists by id
-    if (cleanSql.includes('FROM pharmacists WHERE id =')) {
+    if (upperSql.includes('FROM PHARMACISTS WHERE ID =')) {
       return memoryDb.pharmacists.filter(p => p.id === Number(params[0]));
     }
-    // 3. Count medicines
-    if (cleanSql.includes('COUNT(*) as count FROM medicines')) {
-      if (cleanSql.includes('WHERE stock_qty = 0')) {
-        return [{ count: memoryDb.medicines.filter(m => m.stock_qty === 0).length }];
+    // 3. Count queries (handles COUNT(*) as count, total, low, out_of_stock, pending)
+    if (upperSql.includes('COUNT(*)')) {
+      if (upperSql.includes('FROM MEDICINES')) {
+        if (upperSql.includes('STOCK_QTY <= 0') || upperSql.includes('STOCK_QTY = 0')) {
+          const count = memoryDb.medicines.filter(m => m.stock_qty <= 0).length;
+          return [{ count, total: count, low: count, out_of_stock: count, pending: count }];
+        }
+        if (upperSql.includes('MIN_THRESHOLD')) {
+          const count = memoryDb.medicines.filter(m => m.stock_qty > 0 && m.stock_qty <= m.min_threshold).length;
+          return [{ count, total: count, low: count, out_of_stock: count, pending: count }];
+        }
+        const count = memoryDb.medicines.length;
+        return [{ count, total: count, low: count, out_of_stock: count, pending: count }];
       }
-      if (cleanSql.includes('WHERE stock_qty > 0 AND stock_qty <= min_threshold')) {
-        return [{ count: memoryDb.medicines.filter(m => m.stock_qty > 0 && m.stock_qty <= m.min_threshold).length }];
+      if (upperSql.includes('FROM PRESCRIPTIONS')) {
+        if (upperSql.includes('PENDING')) {
+          const count = memoryDb.prescriptions.filter(p => p.status === 'Pending').length;
+          return [{ count, total: count, low: count, out_of_stock: count, pending: count }];
+        }
+        const count = memoryDb.prescriptions.length;
+        return [{ count, total: count, low: count, out_of_stock: count, pending: count }];
       }
-      return [{ count: memoryDb.medicines.length }];
+      if (upperSql.includes('FROM PRESCRIPTION_ITEMS')) {
+        const pId = Number(params[0]);
+        const pending = memoryDb.prescription_items.filter(i => i.prescription_id === pId && !i.dispensed).length;
+        return [{ count: pending, total: pending, low: pending, out_of_stock: pending, pending }];
+      }
     }
-    // 4. Count prescriptions pending
-    if (cleanSql.includes('COUNT(*) as count FROM prescriptions WHERE status = "Pending"')) {
-      return [{ count: memoryDb.prescriptions.filter(p => p.status === 'Pending').length }];
-    }
-    // 5. Active alerts list
-    if (cleanSql.includes('FROM medicines WHERE stock_qty <= min_threshold')) {
+    // 4. Active alerts list
+    if (upperSql.includes('FROM MEDICINES WHERE STOCK_QTY <= MIN_THRESHOLD')) {
       let list = memoryDb.medicines.filter(m => m.stock_qty <= m.min_threshold).map(m => ({
         ...m,
         deficit: m.min_threshold - m.stock_qty
       }));
-      if (cleanSql.includes('stock_qty > 0')) {
+      if (upperSql.includes('STOCK_QTY > 0')) {
         list = list.filter(m => m.stock_qty > 0);
-      } else if (cleanSql.includes('stock_qty = 0')) {
-        list = list.filter(m => m.stock_qty === 0);
+      } else if (upperSql.includes('STOCK_QTY <= 0') || upperSql.includes('STOCK_QTY = 0')) {
+        list = list.filter(m => m.stock_qty <= 0);
       }
       return list;
     }
-    // 6. Medicines list / search
-    if (cleanSql.includes('FROM medicines')) {
-      if (cleanSql.includes('WHERE id =')) {
+    // 5. Medicines list / search
+    if (upperSql.includes('FROM MEDICINES')) {
+      if (upperSql.includes('WHERE ID =')) {
         return memoryDb.medicines.filter(m => m.id === Number(params[0]));
       }
-      if (cleanSql.includes('WHERE code = ? OR name = ?')) {
+      if (upperSql.includes('WHERE CODE = ? OR NAME = ?')) {
         return memoryDb.medicines.filter(m => m.code === params[0] || m.name === params[1]);
       }
-      if (cleanSql.includes('WHERE name LIKE ? OR code LIKE ?')) {
+      if (upperSql.includes('WHERE CODE = ?')) {
+        return memoryDb.medicines.filter(m => m.code === params[0]);
+      }
+      if (upperSql.includes('WHERE NAME LIKE ? OR CODE LIKE ?')) {
         const term = params[0].replace(/%/g, '').toLowerCase();
         return memoryDb.medicines.filter(m => m.name.toLowerCase().includes(term) || m.code.toLowerCase().includes(term));
       }
       return [...memoryDb.medicines].sort((a, b) => a.name.localeCompare(b.name));
     }
-    // 7. Recent Transactions (Join)
-    if (cleanSql.includes('FROM stock_transactions')) {
-      if (cleanSql.includes('WHERE t.medicine_id =')) {
+    // 6. Recent Transactions (Join)
+    if (upperSql.includes('FROM STOCK_TRANSACTIONS')) {
+      if (upperSql.includes('WHERE T.MEDICINE_ID =') || upperSql.includes('WHERE MEDICINE_ID =')) {
         const medId = Number(params[0]);
         return memoryDb.stock_transactions
           .filter(t => t.medicine_id === medId)
@@ -227,19 +245,19 @@ function parseAndExecuteMemoryQuery(sql, params) {
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
         .slice(0, 6);
     }
-    // 8. Prescriptions List
-    if (cleanSql.includes('FROM prescriptions')) {
-      if (cleanSql.includes('WHERE id =')) {
+    // 7. Prescriptions List
+    if (upperSql.includes('FROM PRESCRIPTIONS')) {
+      if (upperSql.includes('WHERE ID =')) {
         return memoryDb.prescriptions.filter(p => p.id === Number(params[0]));
       }
-      if (cleanSql.includes('WHERE status =')) {
+      if (upperSql.includes('WHERE STATUS =')) {
         return memoryDb.prescriptions.filter(p => p.status === params[0]);
       }
       return [...memoryDb.prescriptions].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     }
-    // 9. Prescription Items Join
-    if (cleanSql.includes('FROM prescription_items')) {
-      if (cleanSql.includes('WHERE pi.id = ? AND pi.prescription_id = ?')) {
+    // 8. Prescription Items Join
+    if (upperSql.includes('FROM PRESCRIPTION_ITEMS')) {
+      if (upperSql.includes('WHERE PI.ID = ? AND PI.PRESCRIPTION_ID = ?') || upperSql.includes('WHERE ID = ? AND PRESCRIPTION_ID = ?')) {
         const itemId = Number(params[0]);
         const pId = Number(params[1]);
         return memoryDb.prescription_items
@@ -249,18 +267,30 @@ function parseAndExecuteMemoryQuery(sql, params) {
             return {
               ...i,
               medicine_name: med ? med.name : '',
+              med_name: med ? med.name : '',
               unit: med ? med.unit : '',
               stock_qty: med ? med.stock_qty : 0,
               min_threshold: med ? med.min_threshold : 0
             };
           });
       }
-      if (cleanSql.includes('COUNT(*) as count FROM prescription_items WHERE prescription_id =')) {
+      if (upperSql.includes('DISPENSED = FALSE') || upperSql.includes('DISPENSED = 0')) {
         const pId = Number(params[0]);
-        const pending = memoryDb.prescription_items.filter(i => i.prescription_id === pId && !i.dispensed).length;
-        return [{ count: pending }];
+        return memoryDb.prescription_items
+          .filter(i => i.prescription_id === pId && !i.dispensed)
+          .map(i => {
+            const med = memoryDb.medicines.find(m => m.id === i.medicine_id);
+            return {
+              ...i,
+              medicine_name: med ? med.name : '',
+              med_name: med ? med.name : '',
+              unit: med ? med.unit : '',
+              stock_qty: med ? med.stock_qty : 0,
+              min_threshold: med ? med.min_threshold : 0
+            };
+          });
       }
-      if (cleanSql.includes('WHERE pi.prescription_id =')) {
+      if (upperSql.includes('WHERE PI.PRESCRIPTION_ID =') || upperSql.includes('WHERE PRESCRIPTION_ID =')) {
         const pId = Number(params[0]);
         return memoryDb.prescription_items
           .filter(i => i.prescription_id === pId)
@@ -270,6 +300,7 @@ function parseAndExecuteMemoryQuery(sql, params) {
             return {
               ...i,
               medicine_name: med ? med.name : 'Medicine',
+              med_name: med ? med.name : 'Medicine',
               medicine_code: med ? med.code : 'CODE',
               unit: med ? med.unit : 'Units',
               stock_qty: med ? med.stock_qty : 0,
@@ -282,8 +313,8 @@ function parseAndExecuteMemoryQuery(sql, params) {
   }
 
   // INSERT queries
-  if (cleanSql.toUpperCase().startsWith('INSERT')) {
-    if (cleanSql.includes('INTO medicines')) {
+  if (upperSql.startsWith('INSERT')) {
+    if (upperSql.includes('INTO MEDICINES')) {
       const newId = memoryDb.medicines.length + 1;
       const newMed = {
         id: newId,
@@ -297,7 +328,7 @@ function parseAndExecuteMemoryQuery(sql, params) {
       memoryDb.medicines.push(newMed);
       return { insertId: newId, affectedRows: 1 };
     }
-    if (cleanSql.includes('INTO stock_transactions')) {
+    if (upperSql.includes('INTO STOCK_TRANSACTIONS')) {
       const newId = memoryDb.stock_transactions.length + 1;
       memoryDb.stock_transactions.push({
         id: newId,
@@ -312,34 +343,39 @@ function parseAndExecuteMemoryQuery(sql, params) {
   }
 
   // UPDATE queries
-  if (cleanSql.toUpperCase().startsWith('UPDATE')) {
-    if (cleanSql.includes('UPDATE medicines SET stock_qty = stock_qty +')) {
-      const qtyAdd = params[0];
-      const medId = Number(params[1]);
-      const med = memoryDb.medicines.find(m => m.id === medId);
-      if (med) med.stock_qty += qtyAdd;
+  if (upperSql.startsWith('UPDATE')) {
+    if (upperSql.includes('UPDATE MEDICINES SET STOCK_QTY = STOCK_QTY +') || upperSql.includes('SET STOCK_QTY = ?')) {
+      if (upperSql.includes('STOCK_QTY +')) {
+        const qtyAdd = params[0];
+        const medId = Number(params[1]);
+        const med = memoryDb.medicines.find(m => m.id === medId);
+        if (med) med.stock_qty += qtyAdd;
+      } else {
+        const newQty = params[0];
+        const medId = Number(params[1]);
+        const med = memoryDb.medicines.find(m => m.id === medId);
+        if (med) med.stock_qty = newQty;
+      }
       return { affectedRows: 1 };
     }
-    if (cleanSql.includes('UPDATE medicines SET stock_qty = stock_qty -')) {
+    if (upperSql.includes('UPDATE MEDICINES SET STOCK_QTY = STOCK_QTY -')) {
       const qtySub = params[0];
       const medId = Number(params[1]);
       const med = memoryDb.medicines.find(m => m.id === medId);
       if (med) med.stock_qty -= qtySub;
       return { affectedRows: 1 };
     }
-    if (cleanSql.includes('UPDATE prescription_items SET dispensed = 1')) {
-      const nowStr = params[0];
-      const phId = params[1];
-      const itemId = Number(params[2]);
+    if (upperSql.includes('UPDATE PRESCRIPTION_ITEMS SET DISPENSED =')) {
+      const itemId = Number(params[params.length - 1]);
       const item = memoryDb.prescription_items.find(i => i.id === itemId);
       if (item) {
         item.dispensed = 1;
-        item.dispensed_at = nowStr;
-        item.dispensed_by = phId;
+        item.dispensed_at = new Date().toISOString();
+        if (params.length > 2) item.dispensed_by = params[1];
       }
       return { affectedRows: 1 };
     }
-    if (cleanSql.includes('UPDATE prescriptions SET status = "Dispensed"')) {
+    if (upperSql.includes('UPDATE PRESCRIPTIONS SET STATUS = "DISPENSED"') || upperSql.includes("UPDATE PRESCRIPTIONS SET STATUS = 'DISPENSED'")) {
       const pId = Number(params[0]);
       const p = memoryDb.prescriptions.find(pr => pr.id === pId);
       if (p) p.status = 'Dispensed';
