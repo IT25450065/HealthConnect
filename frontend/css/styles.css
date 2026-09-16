@@ -3143,3 +3143,22 @@ code { color: #4d4d4d !important; background: #efefef !important; border: 1px so
   }
 }
 
+.user-avatar-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.user-avatar-btn:hover {
+  transform: scale(1.1);
+}
+
+.user-avatar-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+

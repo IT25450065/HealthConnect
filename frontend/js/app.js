@@ -121,8 +121,8 @@ function setupEventListeners() {
   if (restockForm) restockForm.addEventListener('submit', handleRestockSubmit);
 
   // Change Password Form submit
-  const changePassForm = document.getElementById('changePasswordForm');
-  if (changePassForm) changePassForm.addEventListener('submit', handleChangePasswordSubmit);
+  const changePassForm = document.getElementById('changePasswordForm') || document.getElementById('panelChangePasswordForm');
+  if (changePassForm) changePassForm.addEventListener('submit', handlePanelChangePasswordSubmit);
 
   // Close profile dropdown menu when clicking outside
   document.addEventListener('click', (e) => {
@@ -966,22 +966,49 @@ function escapeHtml(str) {
    CHANGE PASSWORD & EXPORT CSV FEATURES
    ========================================================================== */
 
+function openUserProfileModal() {
+  const currentPassEl = document.getElementById('panelCurrentPassword');
+  const newPassEl = document.getElementById('panelNewPassword');
+  const confirmPassEl = document.getElementById('panelConfirmPassword');
+  if (currentPassEl) currentPassEl.value = '';
+  if (newPassEl) newPassEl.value = '';
+  if (confirmPassEl) confirmPassEl.value = '';
+
+  if (currentUser) {
+    const nameEl = document.getElementById('panelUserName');
+    const emailEl = document.getElementById('panelUserEmail');
+    const avatarEl = document.getElementById('modalUserAvatar');
+
+    if (nameEl) nameEl.textContent = currentUser.name;
+    if (emailEl) emailEl.textContent = currentUser.email;
+    if (avatarEl) {
+      const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      avatarEl.textContent = initials || 'PH';
+    }
+  }
+
+  const modal = document.getElementById('modalUserProfile');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeUserProfileModal() {
+  const modal = document.getElementById('modalUserProfile');
+  if (modal) modal.classList.add('hidden');
+}
+
 function openChangePasswordModal() {
-  document.getElementById('currentPasswordInput').value = '';
-  document.getElementById('newPasswordInput').value = '';
-  document.getElementById('confirmPasswordInput').value = '';
-  document.getElementById('modalChangePassword').classList.remove('hidden');
+  openUserProfileModal();
 }
 
 function closeChangePasswordModal() {
-  document.getElementById('modalChangePassword').classList.add('hidden');
+  closeUserProfileModal();
 }
 
-async function handleChangePasswordSubmit(e) {
+async function handlePanelChangePasswordSubmit(e) {
   e.preventDefault();
-  const currentPassword = document.getElementById('currentPasswordInput').value;
-  const newPassword = document.getElementById('newPasswordInput').value;
-  const confirmPassword = document.getElementById('confirmPasswordInput').value;
+  const currentPassword = (document.getElementById('panelCurrentPassword') || document.getElementById('currentPasswordInput')).value;
+  const newPassword = (document.getElementById('panelNewPassword') || document.getElementById('newPasswordInput')).value;
+  const confirmPassword = (document.getElementById('panelConfirmPassword') || document.getElementById('confirmPasswordInput')).value;
 
   if (newPassword !== confirmPassword) {
     showToast('New password and confirm password do not match.', 'error');
@@ -994,11 +1021,12 @@ async function handleChangePasswordSubmit(e) {
   }
 
   try {
+    const tokenVal = authToken || localStorage.getItem('hc_pharmacist_token');
     const res = await fetch(`${API_BASE}/auth/change-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
+        'Authorization': `Bearer ${tokenVal}`
       },
       body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
     });
@@ -1006,7 +1034,7 @@ async function handleChangePasswordSubmit(e) {
     const data = await res.json();
     if (res.ok && data.success) {
       showToast(data.message, 'success');
-      closeChangePasswordModal();
+      closeUserProfileModal();
     } else {
       showToast(data.message || 'Failed to update password.', 'error');
     }
@@ -1014,6 +1042,10 @@ async function handleChangePasswordSubmit(e) {
     console.error('Error changing password:', err);
     showToast('Network error while changing password.', 'error');
   }
+}
+
+async function handleChangePasswordSubmit(e) {
+  return handlePanelChangePasswordSubmit(e);
 }
 
 async function exportLowStockCSV() {

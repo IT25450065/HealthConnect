@@ -38,9 +38,10 @@
 
       <div class="notch-user-section">
         <button id="btnThemeToggle" class="btn-theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch appearance" onclick="toggleTheme()">Theme</button>
-        <button id="btnChangePassword" class="btn-theme-toggle" type="button" title="Change Account Password" onclick="openChangePasswordModal()" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">🔑 Password</button>
-        <div class="user-avatar-sm" id="userAvatarNav" title="Pharmacist Account">Ph</div>
-        <button id="btnLogout" class="btn-logout-notch" onclick="handleLogout()">Logout</button>
+        <!-- Round Shape Profile Avatar Button -->
+        <button id="btnUserProfile" class="user-avatar-btn" type="button" onclick="openUserProfileModal()" title="Pharmacist Account Details & Security">
+          <div class="user-avatar-sm" id="userAvatarNav">Ph</div>
+        </button>
       </div>
 
     </div>
@@ -493,39 +494,56 @@
     </div>
   </div>
 
-  <!-- MODAL: CHANGE PASSWORD -->
-  <div id="modalChangePassword" class="modal-overlay hidden">
-    <div class="modal-content">
+  <!-- MODAL: PHARMACIST ACCOUNT & SECURITY PANEL -->
+  <div id="modalUserProfile" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 480px;">
       <div class="modal-header">
-        <h3>🔑 Change Pharmacist Password</h3>
-        <button class="modal-close" onclick="closeChangePasswordModal()">&times;</button>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="user-avatar-sm" id="modalUserAvatar" style="width: 38px; height: 38px; font-size: 0.95rem; font-weight: 800;">Ph</div>
+          <div>
+            <h3 id="panelUserName" style="font-size: 1.15rem; font-weight: 800; margin: 0;">Pharmacist Account</h3>
+            <div id="panelUserEmail" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500; margin-top: 2px;">pharmacist@healthconnect.com</div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeUserProfileModal()">&times;</button>
       </div>
-      <form id="changePasswordForm">
-        <div class="modal-body">
-          <div style="background: var(--primary-light); border: 1px solid var(--primary-border); padding: 0.9rem; border-radius: 10px; margin-bottom: 1.1rem; font-size: 0.85rem; color: var(--text-muted);">
-            Update your account password securely. New password must be at least 6 characters.
+
+      <div class="modal-body" style="padding: 1.5rem;">
+        <!-- Security Section: Change Password -->
+        <form id="panelChangePasswordForm">
+          <div style="font-weight: 800; font-size: 0.95rem; color: var(--secondary); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 6px;">
+            <span>🔑 Change Account Password</span>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Current Password *</label>
-            <input type="password" id="currentPasswordInput" class="form-control" placeholder="Enter current password" required>
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-size: 0.8rem;">Current Password *</label>
+            <input type="password" id="panelCurrentPassword" class="form-control" placeholder="Enter current password" required>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">New Password *</label>
-            <input type="password" id="newPasswordInput" class="form-control" minlength="6" placeholder="Enter new password (min 6 characters)" required>
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-size: 0.8rem;">New Password *</label>
+            <input type="password" id="panelNewPassword" class="form-control" minlength="6" placeholder="Enter new password (min 6 characters)" required>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Confirm New Password *</label>
-            <input type="password" id="confirmPasswordInput" class="form-control" minlength="6" placeholder="Re-enter new password" required>
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-size: 0.8rem;">Confirm New Password *</label>
+            <input type="password" id="panelConfirmPassword" class="form-control" minlength="6" placeholder="Re-enter new password" required>
           </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="padding: 0.65rem 1rem; font-weight: 700;">
+            Update Password
+          </button>
+        </form>
+
+        <div style="height: 1px; background: rgba(150, 150, 150, 0.2); margin: 1.5rem 0;"></div>
+
+        <!-- Account Actions: Logout -->
+        <div>
+          <button id="btnLogout" type="button" class="btn btn-secondary btn-block" onclick="handleLogout(); closeUserProfileModal();" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; color: var(--danger); border-color: rgba(255, 69, 58, 0.3);">
+            <span>🚪 Logout Pharmacist Session</span>
+          </button>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeChangePasswordModal()">Cancel</button>
-          <button type="submit" class="btn btn-radial-glow">Update Password</button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 
