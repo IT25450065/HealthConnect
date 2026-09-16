@@ -97,7 +97,7 @@
       <div class="page-title-row">
         <div>
           <h1 class="page-title">Pharmacist Dashboard</h1>
-          <p class="page-subtitle">Real-time overview of inventory status, active low-stock alerts (PB07), and prescription queue.</p>
+          <p class="page-subtitle">Real-time overview of inventory status, active low-stock alerts, and prescription queue.</p>
         </div>
         <button class="btn btn-secondary" data-tooltip="Fetch latest inventory & prescription queue metrics" onclick="loadDashboardStats()">🔄 Refresh Live Data</button>
       </div>
@@ -115,7 +115,7 @@
           </div>
         </div>
 
-        <div class="kpi-card" data-tooltip="Medicines at or below configured minimum threshold (PB07)">
+        <div class="kpi-card" data-tooltip="Medicines at or below configured minimum threshold">
           <div>
             <div class="kpi-title">Low Stock Items</div>
             <div class="stat-number-wrapper">
@@ -137,7 +137,7 @@
           </div>
         </div>
 
-        <div class="kpi-card" data-tooltip="Active doctor prescriptions pending pharmacist dispensing (PB13)">
+        <div class="kpi-card" data-tooltip="Active doctor prescriptions pending pharmacist dispensing">
           <div>
             <div class="kpi-title">Pending Prescriptions</div>
             <div class="stat-number-wrapper">
@@ -151,13 +151,13 @@
 
       <!-- Bento Grid Asymmetric Layout -->
       <div class="bento-grid">
-        <!-- Bento Panel 1 (Col 8): Low-Stock Alert Panel (PB07) -->
+        <!-- Bento Panel 1 (Col 8): Low-Stock Alert Panel -->
         <div class="bento-col-8">
           <div id="dashboardAlertsBanner" class="alerts-banner-card">
             <div class="alerts-header">
               <div class="alerts-title">
                 <span class="pulsing-dot"></span>
-                <span>Active Low-Stock & Out-of-Stock Alerts (PB07)</span>
+                <span>Active Low-Stock & Out-of-Stock Alerts</span>
               </div>
               <button class="btn btn-secondary link-hover link-hover--slide" style="font-size: 0.85rem; padding: 0.4rem 0.85rem;" onclick="switchTab('alerts')">
                 <span>View All in Low Stock List →</span>
@@ -188,7 +188,7 @@
                 View Dispensing Queue
               </button>
               <button class="btn btn-secondary btn-block" onclick="switchTab('alerts')">
-                View Deficit Reports (PB12)
+                View Deficit Reports
               </button>
             </div>
           </div>
@@ -223,14 +223,14 @@
 
       <!-- FAQ ACCORDION SECTION (VENGEANCE-UI SPECIFICATION) -->
       <div class="content-card">
-        <h3 style="color: var(--secondary); font-size: 1.2rem; font-weight: 800; margin-bottom: 0.4rem;">❓ Module Help & Backlog Guidance (PB06 - PB13)</h3>
+        <h3 style="color: var(--secondary); font-size: 1.2rem; font-weight: 800; margin-bottom: 0.4rem;">❓ Module Help & Operational Guidance</h3>
         <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">Click any question below to expand the operational guidelines for this module.</p>
         
         <div class="faq-container">
-          <!-- FAQ 1 (PB06) -->
+          <!-- FAQ 1 -->
           <div class="faq-item">
             <button class="faq-question-btn" onclick="toggleFaq(this)">
-              <span>💊 PB06: How do I restock existing medicines or add new records?</span>
+              <span>💊 How do I restock existing medicines or add new records?</span>
               <span class="faq-chevron">▼</span>
             </button>
             <div class="faq-answer-panel">
@@ -240,10 +240,10 @@
             </div>
           </div>
 
-          <!-- FAQ 2 (PB07) -->
+          <!-- FAQ 2 -->
           <div class="faq-item">
             <button class="faq-question-btn" onclick="toggleFaq(this)">
-              <span>⚠️ PB07: How do Low-Stock Alerts trigger?</span>
+              <span>⚠️ How do Low-Stock Alerts trigger?</span>
               <span class="faq-chevron">▼</span>
             </button>
             <div class="faq-answer-panel">
@@ -253,10 +253,10 @@
             </div>
           </div>
 
-          <!-- FAQ 3 (PB12) -->
+          <!-- FAQ 3 -->
           <div class="faq-item">
             <button class="faq-question-btn" onclick="toggleFaq(this)">
-              <span>📊 PB12: How do I filter and sort Low and Out-of-Stock items?</span>
+              <span>📊 How do I filter and sort Low and Out-of-Stock items?</span>
               <span class="faq-chevron">▼</span>
             </button>
             <div class="faq-answer-panel">
@@ -266,10 +266,10 @@
             </div>
           </div>
 
-          <!-- FAQ 4 (PB13) -->
+          <!-- FAQ 4 -->
           <div class="faq-item">
             <button class="faq-question-btn" onclick="toggleFaq(this)">
-              <span>📋 PB13: How does Prescription Dispensing and Stock Deduction work?</span>
+              <span>📋 How does Prescription Dispensing and Stock Deduction work?</span>
               <span class="faq-chevron">▼</span>
             </button>
             <div class="faq-answer-panel">
@@ -282,11 +282,11 @@
       </div>
     </section>
 
-    <!-- TAB 2: MEDICINE STOCK MANAGEMENT (PB06) -->
+    <!-- TAB 2: MEDICINE STOCK MANAGEMENT -->
     <section id="tabStock" class="tab-page hidden">
       <div class="page-title-row">
         <div>
-          <h1 class="page-title">Medicine Stock Management (PB06)</h1>
+          <h1 class="page-title">Medicine Stock Management</h1>
           <p class="page-subtitle">Search medicines by name or code, receive batch deliveries, or create new inventory records.</p>
         </div>
         <button class="btn btn-radial-glow" onclick="openAddMedicineModal()">➕ Add New Medicine Record</button>
@@ -333,11 +333,11 @@
       </div>
     </section>
 
-    <!-- TAB 3: LOW / OUT-OF-STOCK LIST (PB12) -->
+    <!-- TAB 3: LOW / OUT-OF-STOCK LIST -->
     <section id="tabAlerts" class="tab-page hidden">
       <div class="page-title-row">
         <div>
-          <h1 class="page-title">Low & Out-of-Stock List (PB12)</h1>
+          <h1 class="page-title">Low & Out-of-Stock List</h1>
           <p class="page-subtitle">Dedicated view listing all medicines currently below minimum threshold or at zero stock.</p>
         </div>
       </div>
@@ -384,11 +384,11 @@
       </div>
     </section>
 
-    <!-- TAB 4: PRESCRIPTION DISPENSING QUEUE (PB13) -->
+    <!-- TAB 4: PRESCRIPTION DISPENSING QUEUE -->
     <section id="tabPrescriptions" class="tab-page hidden">
       <div class="page-title-row">
         <div>
-          <h1 class="page-title">Prescription Dispensing Queue (PB13)</h1>
+          <h1 class="page-title">Prescription Dispensing Queue</h1>
           <p class="page-subtitle">Doctor-issued prescriptions queue with automatic inventory stock deduction upon dispensing.</p>
         </div>
       </div>
