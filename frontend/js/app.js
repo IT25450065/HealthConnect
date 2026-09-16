@@ -124,6 +124,10 @@ function setupEventListeners() {
   const changePassForm = document.getElementById('changePasswordForm') || document.getElementById('panelChangePasswordForm');
   if (changePassForm) changePassForm.addEventListener('submit', handlePanelChangePasswordSubmit);
 
+  // Update Profile Form submit
+  const profileForm = document.getElementById('panelUpdateProfileForm');
+  if (profileForm) profileForm.addEventListener('submit', handlePanelUpdateProfileSubmit);
+
   // Close profile dropdown menu when clicking outside
   document.addEventListener('click', (e) => {
     const dropdown = document.getElementById('profileDropdownMenu');
@@ -978,9 +982,14 @@ function openUserProfileModal() {
     const nameEl = document.getElementById('panelUserName');
     const emailEl = document.getElementById('panelUserEmail');
     const avatarEl = document.getElementById('modalUserAvatar');
+    const inputName = document.getElementById('panelInputName');
+    const inputEmail = document.getElementById('panelInputEmail');
 
     if (nameEl) nameEl.textContent = currentUser.name;
     if (emailEl) emailEl.textContent = currentUser.email;
+    if (inputName) inputName.value = currentUser.name;
+    if (inputEmail) inputEmail.value = currentUser.email;
+
     if (avatarEl) {
       const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
       avatarEl.textContent = initials || 'PH';
@@ -989,6 +998,42 @@ function openUserProfileModal() {
 
   const modal = document.getElementById('modalUserProfile');
   if (modal) modal.classList.remove('hidden');
+}
+
+async function handlePanelUpdateProfileSubmit(e) {
+  e.preventDefault();
+  const name = document.getElementById('panelInputName').value.trim();
+  const email = document.getElementById('panelInputEmail').value.trim();
+
+  if (!name || !email) {
+    showToast('Name and email address are required.', 'error');
+    return;
+  }
+
+  try {
+    const tokenVal = authToken || localStorage.getItem('hc_pharmacist_token');
+    const res = await fetch(`${API_BASE}/auth/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${tokenVal}`
+      },
+      body: JSON.stringify({ name, email })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      currentUser.name = data.user.name;
+      currentUser.email = data.user.email;
+      showAppScreen();
+      showToast(data.message, 'success');
+    } else {
+      showToast(data.message || 'Failed to update profile.', 'error');
+    }
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    showToast('Network error while updating profile details.', 'error');
+  }
 }
 
 function closeUserProfileModal() {

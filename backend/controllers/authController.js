@@ -108,3 +108,39 @@ exports.changePassword = async (req, res) => {
   }
 };
 
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const userId = req.user.id;
+
+    if (!name || !email) {
+      return res.status(400).json({ success: false, message: 'Name and email are required.' });
+    }
+
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+
+    const existing = await db.query('SELECT id FROM pharmacists WHERE email = ? AND id != ?', [trimmedEmail, userId]);
+    if (existing.length > 0) {
+      return res.status(400).json({ success: false, message: 'Email address is already in use by another account.' });
+    }
+
+    await db.query('UPDATE pharmacists SET name = ?, email = ? WHERE id = ?', [trimmedName, trimmedEmail, userId]);
+
+    res.json({
+      success: true,
+      message: 'Pharmacist profile updated successfully!',
+      user: {
+        id: userId,
+        name: trimmedName,
+        email: trimmedEmail,
+        role: 'pharmacist'
+      }
+    });
+  } catch (err) {
+    console.error('Update Profile Error:', err);
+    res.status(500).json({ success: false, message: 'Server error updating profile details.' });
+  }
+};
+
+
