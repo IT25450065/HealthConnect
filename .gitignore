@@ -1,6 +1,7 @@
-# Maven build output
+# Temp scratch & build
 target/
 *.class
+apache-maven-3.9.9/
 
 # IDE & Editor files
 .idea/
