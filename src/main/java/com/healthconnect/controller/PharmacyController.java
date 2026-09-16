@@ -41,8 +41,6 @@ public class PharmacyController {
         model.addAttribute("lowStock", pharmacyService.findLowStock());
         model.addAttribute("pendingCount", pharmacyService.countPending());
         model.addAttribute("dispensedCount", pharmacyService.countDispensed());
-        model.addAttribute("totalMedicinesCount", pharmacyService.countTotalMedicines());
-        model.addAttribute("outOfStockCount", pharmacyService.countOutOfStock());
         return "pharmacy/dashboard";
     }
 
@@ -103,17 +101,10 @@ public class PharmacyController {
     // ------------------------------------------------------------------
 
     @GetMapping("/medicines")
-    public String medicines(@RequestParam(name = "q", required = false) String q,
-                            @RequestParam(name = "lowStockOnly", required = false, defaultValue = "false") boolean lowStockOnly,
-                            Model model) {
-        if (lowStockOnly) {
-            model.addAttribute("medicines", pharmacyService.findLowStock());
-        } else {
-            model.addAttribute("medicines", pharmacyService.findMedicines(q));
-        }
+    public String medicines(@RequestParam(name = "q", required = false) String q, Model model) {
+        model.addAttribute("medicines", pharmacyService.findMedicines(q));
         model.addAttribute("lowStockCount", pharmacyService.findLowStock().size());
         model.addAttribute("q", q);
-        model.addAttribute("lowStockOnly", lowStockOnly);
         return "pharmacy/medicines";
     }
 
