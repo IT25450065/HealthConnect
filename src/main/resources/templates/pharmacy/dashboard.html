@@ -1,62 +1,132 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Pharmacy dashboard')}"></head>
+<head th:replace="~{fragments/layout :: head('Pharmacist Dashboard')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <div class="container">
-    <div class="page-head"><h1>Pharmacy dashboard</h1></div>
+    <!-- Page Header -->
+    <div class="page-head">
+        <div class="page-head-content">
+            <h1>Pharmacist Dashboard</h1>
+            <p>Real-time overview of inventory status, active low-stock alerts, and prescription queue.</p>
+        </div>
+        <div>
+            <a class="btn btn-outline-pill" th:href="@{/pharmacy/dashboard}">
+                <span>↻</span> Refresh Live Data
+            </a>
+        </div>
+    </div>
+
     <div th:replace="~{fragments/layout :: messages}"></div>
 
+    <!-- 4 Stat Cards Grid (Matching UI Screenshot 1) -->
     <div class="stat-row">
-        <div class="stat amber">
-            <div class="value" th:text="${pendingCount}">0</div>
-            <div class="label">Prescriptions waiting</div>
+        <div class="stat-card">
+            <div class="stat-header">Total Medicines</div>
+            <div class="stat-value-group">
+                <span class="stat-value" th:text="${totalMedicinesCount}">0</span>
+                <span class="stat-unit">items</span>
+            </div>
+            <span class="stat-tag">Registered Inventory</span>
         </div>
-        <div class="stat">
-            <div class="value" th:text="${dispensedCount}">0</div>
-            <div class="label">Dispensed to date</div>
+
+        <div class="stat-card">
+            <div class="stat-header">Low Stock Items</div>
+            <div class="stat-value-group">
+                <span class="stat-value" th:text="${lowStock.size()}">0</span>
+                <span class="stat-unit">items</span>
+            </div>
+            <span class="stat-tag">Needs Replenishment</span>
         </div>
-        <div class="stat danger">
-            <div class="value" th:text="${lowStock.size()}">0</div>
-            <div class="label">Medicines at or below reorder level</div>
+
+        <div class="stat-card">
+            <div class="stat-header">Out of Stock</div>
+            <div class="stat-value-group">
+                <span class="stat-value" th:text="${outOfStockCount}">0</span>
+                <span class="stat-unit">items</span>
+            </div>
+            <span class="stat-tag">Zero Inventory</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">Pending Prescriptions</div>
+            <div class="stat-value-group">
+                <span class="stat-value" th:text="${pendingCount}">0</span>
+                <span class="stat-unit">queues</span>
+            </div>
+            <span class="stat-tag">Awaiting Dispensing</span>
         </div>
     </div>
 
-    <div class="alert error" th:unless="${lowStock.isEmpty()}">
-        <strong>Low stock alert.</strong>
-        <span th:each="m, s : ${lowStock}">
-            <span th:text="${m.label}">name</span>
-            (<span th:text="${m.stockQuantity}">0</span> left)<span th:unless="${s.last}">, </span>
-        </span>
-        &mdash; <a th:href="@{/pharmacy/medicines}">update the inventory</a>.
-    </div>
+    <!-- Main Dashboard Split Grid -->
+    <div class="dashboard-grid">
+        <!-- Left Panel: Active Low-Stock & Out-of-Stock Alerts -->
+        <div>
+            <div class="card" style="padding: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                    <h3 style="font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                        <span>●</span> Active Low-Stock & Out-of-Stock Alerts
+                    </h3>
+                    <a class="btn btn-outline-pill" th:href="@{/pharmacy/medicines?lowStockOnly=true}">View All in Low Stock List →</a>
+                </div>
 
-    <div class="card">
-        <h2>Prescriptions waiting to be dispensed</h2>
-        <div th:if="${pending.isEmpty()}" class="empty">Nothing is waiting. The queue is clear.</div>
+                <div th:if="${lowStock.isEmpty()}" class="alert-banner alert-success" style="margin-bottom: 0;">
+                    <span>✓</span> All medicine stock levels are currently healthy and above threshold.
+                </div>
 
-        <div class="table-wrap" th:unless="${pending.isEmpty()}">
-            <table>
-                <thead>
-                <tr>
-                    <th>Issued</th>
-                    <th>Patient</th>
-                    <th>Prescribed by</th>
-                    <th class="num">Items</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="p : ${pending}">
-                    <td th:text="${p.issuedLabel}">date</td>
-                    <td th:text="${p.patient.fullName}">patient</td>
-                    <td th:text="${p.doctor.fullName}">doctor</td>
-                    <td class="num" th:text="${p.items.size()}">0</td>
-                    <td><a class="btn small" th:href="@{'/pharmacy/prescriptions/' + ${p.id}}">Open</a></td>
-                </tr>
-                </tbody>
-            </table>
+                <div th:unless="${lowStock.isEmpty()}">
+                    <div class="alert-item-card" th:each="m : ${lowStock}">
+                        <div class="alert-item-info">
+                            <h4>
+                                <span th:text="${m.name}">Ibuprofen</span>
+                                <span th:if="${m.strength != null and !m.strength.isBlank()}" th:text="${m.strength}">400mg</span>
+                                <span class="item-code" th:text="'MED-' + ${m.id}">MED-1003</span>
+                            </h4>
+                            <p>
+                                Current Stock: <strong th:classappend="${m.stockQuantity == 0 ? 'text-danger' : 'text-warning'}" th:text="${m.stockQuantity} + ' ' + ${m.unit}">0 Tablets</strong>
+                                | Min Threshold: <span th:text="${m.reorderThreshold} + ' ' + ${m.unit}">40 Tablets</span>
+                                <span th:if="${m.stockQuantity < m.reorderThreshold}" 
+                                      th:text="'(Deficit: ' + (${m.reorderThreshold - m.stockQuantity}) + ' ' + ${m.unit} + ')'" 
+                                      style="color: var(--danger); font-weight: 700; margin-left: 4px;">
+                                </span>
+                            </p>
+                        </div>
+                        <div class="alert-item-actions">
+                            <span class="badge-pill" 
+                                  th:classappend="${m.stockQuantity == 0 ? 'status-out-of-stock' : 'status-low-stock'}" 
+                                  th:text="${m.stockQuantity == 0 ? 'OUT OF STOCK' : 'LOW STOCK'}">
+                                LOW STOCK
+                            </span>
+                            <form method="post" th:action="@{'/pharmacy/medicines/' + ${m.id} + '/adjust'}" style="margin: 0;">
+                                <input type="hidden" name="delta" value="50">
+                                <button type="submit" class="btn btn-small">Receive Stock</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Quick Task Panel & Shortcuts -->
+        <div>
+            <div class="card" style="padding: 24px;">
+                <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">QUICK TASK PANEL</span>
+                <h3 style="font-size: 1.25rem; font-weight: 800; margin: 6px 0 10px;">Pharmacist Workflow Shortcuts</h3>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px;">Select an action below to quickly jump into medicine stock additions or prescription dispensing.</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <a th:href="@{/pharmacy/prescriptions}" class="btn" style="width: 100%; justify-content: center;">
+                        <span>📋</span> View Dispensing Queue
+                    </a>
+                    <a th:href="@{/pharmacy/medicines}" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                        <span>📦</span> Manage Medicine Inventory
+                    </a>
+                    <a th:href="@{/pharmacy/medicines/new}" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                        <span>➕</span> Add New Medicine Record
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

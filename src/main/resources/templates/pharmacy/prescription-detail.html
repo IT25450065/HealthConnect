@@ -1,58 +1,92 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Prescription')}"></head>
+<head th:replace="~{fragments/layout :: head('Prescription Detail')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <div class="container">
+    <!-- Page Header -->
     <div class="page-head">
-        <h1>Prescription</h1>
-        <span class="badge" th:classappend="${prescription.status.name()}"
-              th:text="${prescription.status.displayName}">status</span>
-        <a class="btn secondary" th:href="@{/pharmacy/prescriptions}">Back to queue</a>
+        <div class="page-head-content">
+            <h1>Prescription Detail</h1>
+            <p>View patient consultation details, prescribed medicine lines, and complete dispensing.</p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <span class="badge-pill" 
+                  th:classappend="${prescription.status.name() == 'DISPENSED' ? 'status-success' : (prescription.status.name() == 'CANCELLED' ? 'status-danger' : 'status-pending')}"
+                  th:text="${prescription.status.displayName}">
+                Pending
+            </span>
+            <a class="btn btn-secondary" th:href="@{/pharmacy/prescriptions}">← Back to Queue</a>
+        </div>
     </div>
+
     <div th:replace="~{fragments/layout :: messages}"></div>
 
+    <!-- Patient & Doctor Detail Card -->
     <div class="card">
-        <p>
-            <strong>Patient:</strong> <span th:text="${prescription.patient.fullName}">patient</span><br>
-            <strong>Prescribed by:</strong> <span th:text="${prescription.doctor.fullName}">doctor</span>
-            (<span th:text="${prescription.doctor.specialization}">spec</span>)<br>
-            <strong>Diagnosis:</strong> <span th:text="${prescription.consultation.diagnosis}">diagnosis</span><br>
-            <strong>Issued:</strong> <span th:text="${prescription.issuedLabel}">date</span>
-        </p>
-        <p th:if="${prescription.dispensedAt != null}" class="muted small">
-            Dispensed <span th:text="${prescription.dispensedLabel}">date</span>
-            <span th:if="${prescription.dispensedBy != null}"
-                  th:text="'by ' + ${prescription.dispensedBy.fullName}"></span>.
-            <span th:if="${prescription.pharmacistNote}" th:text="'Note: ' + ${prescription.pharmacistNote}"></span>
-        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">PATIENT DETAILS</span>
+                <h3 style="font-size: 1.25rem; font-weight: 800; margin: 4px 0 6px;" th:text="${prescription.patient.fullName}">Maria Garcia</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    Issued: <strong th:text="${prescription.issuedLabel}">Sep 7, 2026</strong>
+                </p>
+            </div>
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">PRESCRIBING DOCTOR</span>
+                <h3 style="font-size: 1.25rem; font-weight: 800; margin: 4px 0 6px;" th:text="${prescription.doctor.fullName}">Dr. Robert Chen</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    Specialization: <strong th:text="${prescription.doctor.specialization}">General Medicine</strong> |
+                    Diagnosis: <strong th:text="${prescription.consultation.diagnosis}">Hypertension</strong>
+                </p>
+            </div>
+        </div>
+
+        <div th:if="${prescription.dispensedAt != null}" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 0.88rem; color: var(--text-muted);">
+            Dispensed on <strong th:text="${prescription.dispensedLabel}">date</strong>
+            <span th:if="${prescription.dispensedBy != null}" th:text="' by ' + ${prescription.dispensedBy.fullName}"></span>.
+            <span th:if="${prescription.pharmacistNote}" th:text="' Pharmacist Note: ' + ${prescription.pharmacistNote}" style="font-weight: 600; color: var(--text-primary);"></span>
+        </div>
     </div>
 
-    <div class="card">
-        <h2>Medicines</h2>
+    <!-- Prescribed Medicine Items Card -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <h3>Prescribed Medicine Lines</h3>
+        </div>
         <div class="table-wrap">
-            <table>
+            <table class="custom-table">
                 <thead>
                 <tr>
                     <th>Medicine</th>
                     <th>Dosage</th>
                     <th>Instructions</th>
-                    <th class="num">Required</th>
-                    <th class="num">In stock</th>
+                    <th class="num">Required Qty</th>
+                    <th class="num">In Stock</th>
                     <th>Check</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="i : ${prescription.items}">
-                    <td th:text="${i.medicine.label}">medicine</td>
-                    <td th:text="${i.dosage}">dosage</td>
-                    <td th:text="${i.instructions}">instructions</td>
-                    <td class="num" th:text="${i.quantity}">0</td>
-                    <td class="num" th:text="${i.medicine.stockQuantity}">0</td>
                     <td>
-                        <span class="badge ok" th:if="${i.medicine.stockQuantity >= i.quantity}">Enough</span>
-                        <span class="badge low" th:unless="${i.medicine.stockQuantity >= i.quantity}">Short</span>
+                        <strong th:text="${i.medicine.label}">Metformin 850mg</strong>
+                    </td>
+                    <td th:text="${i.dosage}">850mg</td>
+                    <td th:text="${i.instructions != null and !i.instructions.isBlank() ? i.instructions : 'As directed'}">Once daily</td>
+                    <td class="num"><strong th:text="${i.quantity} + ' ' + (${i.medicine.unit != null ? i.medicine.unit : ''})">30 Tablets</strong></td>
+                    <td class="num">
+                        <span th:classappend="${i.medicine.stockQuantity < i.quantity ? 'text-danger' : ''}"
+                              th:text="${i.medicine.stockQuantity} + ' ' + (${i.medicine.unit != null ? i.medicine.unit : ''})">
+                            80 Tablets
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge-pill" 
+                              th:classappend="${i.medicine.stockQuantity >= i.quantity ? 'status-success' : 'status-danger'}"
+                              th:text="${i.medicine.stockQuantity >= i.quantity ? 'In Stock' : 'Insufficient Stock'}">
+                            In Stock
+                        </span>
                     </td>
                 </tr>
                 </tbody>
@@ -60,32 +94,30 @@
         </div>
     </div>
 
+    <!-- Dispense & Cancel Action Forms -->
     <div class="card" th:if="${prescription.pending}">
-        <h2>Dispense</h2>
-        <p class="muted small">
-            Dispensing subtracts every quantity above from the medicine stock in the same
-            transaction. If any line is short, nothing at all is deducted.
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 8px;">Complete Dispensing</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px;">
+            Dispensing subtracts every quantity above from medicine inventory stock in a single atomic transaction.
+            If any line item is short, nothing at all is deducted.
         </p>
+
         <form method="post" th:action="@{'/pharmacy/prescriptions/' + ${prescription.id} + '/dispense'}">
-            <div class="form-row">
-                <label for="note">Pharmacist note (optional)</label>
-                <input type="text" id="note" name="note" placeholder="e.g. counselled on dosage">
+            <div class="form-group">
+                <label class="form-label" for="note">Pharmacist Note (Optional)</label>
+                <input type="text" class="form-control" id="note" name="note" placeholder="e.g. Counselled patient on dosage and storage">
             </div>
-            <div class="form-actions">
-                <button class="btn" type="submit">Mark as dispensed and update stock</button>
-            </div>
+            <button class="btn" type="submit" style="width: 100%;">Mark Prescription as Dispensed and Update Stock</button>
         </form>
 
-        <hr style="border:none;border-top:1px solid #d7dee5;margin:18px 0">
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 24px 0;">
 
         <form method="post" th:action="@{'/pharmacy/prescriptions/' + ${prescription.id} + '/cancel'}">
-            <div class="form-row">
-                <label for="reason">Reason for cancelling</label>
-                <input type="text" id="reason" name="reason">
+            <div class="form-group">
+                <label class="form-label" for="reason">Reason for Cancelling</label>
+                <input type="text" class="form-control" id="reason" name="reason" placeholder="e.g. Prescription cancelled by doctor">
             </div>
-            <div class="form-actions">
-                <button class="btn danger" type="submit">Cancel this prescription</button>
-            </div>
+            <button class="btn btn-danger" type="submit">Cancel This Prescription</button>
         </form>
     </div>
 </div>

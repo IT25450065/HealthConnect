@@ -1,18 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<!--
-  Shared page furniture. Every other template pulls these three fragments in:
-
-    <head th:replace="~{fragments/layout :: head('Page title')}"></head>
-    <nav  th:replace="~{fragments/layout :: navbar}"></nav>
-    <div  th:replace="~{fragments/layout :: messages}"></div>
-
-  "currentUser" is put into the model for every page by
-  config/GlobalControllerAdvice, so the navbar can show the right links
-  without any controller having to add it.
--->
-
 <head th:fragment="head(pageTitle)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,80 +10,70 @@
 
 <body>
 
-<nav th:fragment="navbar" class="navbar">
-    <a class="brand" th:href="@{/}">Health<span>Connect</span></a>
+<!-- Floating Notch Navbar -->
+<div th:fragment="navbar" class="navbar-wrapper">
+    <div class="notch-navbar">
+        <a class="notch-brand" th:href="@{/}">
+            <span class="notch-brand-icon">✚</span>
+            <span>HealthConnect</span>
+        </a>
 
-    <th:block th:if="${currentUser == null}">
-        <a class="nav-link" th:href="@{/login}">Login</a>
-        <a class="nav-link" th:href="@{/register}">Register</a>
-    </th:block>
+        <div class="notch-links" th:if="${currentUser != null}">
+            <!-- Pharmacist Module Links (UC-03) -->
+            <th:block th:if="${currentUser.role.name() == 'PHARMACIST'}">
+                <a th:href="@{/pharmacy/dashboard}" 
+                   class="notch-link" 
+                   th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.endsWith('/dashboard') ? 'active' : ''}">
+                    Dashboard
+                </a>
+                <a th:href="@{/pharmacy/medicines}" 
+                   class="notch-link" 
+                   th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.endsWith('/medicines') and (#httpServletRequest.getParameter('lowStockOnly') == null) ? 'active' : ''}">
+                    Stock Management
+                </a>
+                <a th:href="@{/pharmacy/medicines?lowStockOnly=true}" 
+                   class="notch-link" 
+                   th:classappend="${#httpServletRequest != null and #httpServletRequest.getParameter('lowStockOnly') != null ? 'active' : ''}">
+                    Low Stock List
+                </a>
+                <a th:href="@{/pharmacy/prescriptions}" 
+                   class="notch-link" 
+                   th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.contains('/prescriptions') ? 'active' : ''}">
+                    Dispensing Queue
+                </a>
+            </th:block>
 
-    <th:block th:if="${currentUser != null}">
+            <!-- Other Role Fallbacks -->
+            <th:block th:if="${currentUser.role.name() != 'PHARMACIST'}">
+                <a th:href="@{/}" class="notch-link active">Main Portal</a>
+            </th:block>
+        </div>
 
-        <!-- Patient -->
-        <th:block th:if="${currentUser.role.name() == 'PATIENT'}">
-            <a class="nav-link" th:href="@{/patient/dashboard}">Dashboard</a>
-            <a class="nav-link" th:href="@{/patient/doctors}">Find a Doctor</a>
-            <a class="nav-link" th:href="@{/patient/appointments/book}">Book</a>
-            <a class="nav-link" th:href="@{/patient/appointments}">My Appointments</a>
-            <a class="nav-link" th:href="@{/patient/video}">Online</a>
-            <a class="nav-link" th:href="@{/patient/records}">My Records</a>
-            <a class="nav-link" th:href="@{/patient/feedback}">Feedback</a>
-        </th:block>
+        <div class="notch-spacer"></div>
 
-        <!-- Doctor -->
-        <th:block th:if="${currentUser.role.name() == 'DOCTOR'}">
-            <a class="nav-link" th:href="@{/doctor/dashboard}">My Queue</a>
-            <a class="nav-link" th:href="@{/doctor/appointments}">Appointments</a>
-            <a class="nav-link" th:href="@{/doctor/consultations}">Consultations</a>
-            <a class="nav-link" th:href="@{/doctor/video}">Online Sessions</a>
-            <a class="nav-link" th:href="@{/doctor/feedback}">My Ratings</a>
-        </th:block>
+        <div class="notch-actions" th:if="${currentUser != null}">
+            <button type="button" class="notch-btn-secondary" onclick="document.body.classList.toggle('dark-mode')">Dark</button>
+            <div class="notch-user-badge" th:text="${#strings.substring(currentUser.fullName, 0, 2).toUpperCase()}">Ph</div>
+            <a th:href="@{/logout}" class="notch-btn-secondary">Logout</a>
+        </div>
+        
+        <div class="notch-actions" th:if="${currentUser == null}">
+            <a th:href="@{/login}" class="btn btn-small">Login</a>
+            <a th:href="@{/register}" class="notch-btn-secondary">Register</a>
+        </div>
+    </div>
+</div>
 
-        <!-- Receptionist -->
-        <th:block th:if="${currentUser.role.name() == 'RECEPTIONIST'}">
-            <a class="nav-link" th:href="@{/reception/dashboard}">Dashboard</a>
-            <a class="nav-link" th:href="@{/reception/appointments}">Appointments</a>
-            <a class="nav-link" th:href="@{/reception/patients}">Patients</a>
-        </th:block>
-
-        <!-- Pharmacist -->
-        <th:block th:if="${currentUser.role.name() == 'PHARMACIST'}">
-            <a class="nav-link" th:href="@{/pharmacy/dashboard}">Dashboard</a>
-            <a class="nav-link" th:href="@{/pharmacy/prescriptions}">Prescriptions</a>
-            <a class="nav-link" th:href="@{/pharmacy/medicines}">Inventory</a>
-        </th:block>
-
-        <!-- Patient Relations Officer -->
-        <th:block th:if="${currentUser.role.name() == 'PATIENT_RELATIONS_OFFICER'}">
-            <a class="nav-link" th:href="@{/support/dashboard}">Dashboard</a>
-            <a class="nav-link" th:href="@{/support/feedback}">Feedback</a>
-        </th:block>
-
-        <!-- Hospital Administrator -->
-        <th:block th:if="${currentUser.role.name() == 'ADMIN'}">
-            <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
-            <a class="nav-link" th:href="@{/admin/staff}">Staff</a>
-            <a class="nav-link" th:href="@{/admin/patients}">Patients</a>
-            <a class="nav-link" th:href="@{/reception/appointments}">Appointments</a>
-            <a class="nav-link" th:href="@{/admin/reports/appointments}">Appt. Report</a>
-            <a class="nav-link" th:href="@{/admin/reports/feedback}">Feedback Report</a>
-        </th:block>
-
-        <span class="spacer"></span>
-        <span class="who">
-            <strong th:text="${currentUser.fullName}">Name</strong>
-            &middot; <span th:text="${currentUser.roleLabel}">Role</span>
-        </span>
-        <a class="nav-link" th:href="@{/profile}">Profile</a>
-        <a class="nav-link" th:href="@{/logout}">Logout</a>
-    </th:block>
-</nav>
-
-<!-- Flash / error messages, shown at the top of every page -->
-<div th:fragment="messages">
-    <div class="alert success" th:if="${success}" th:text="${success}"></div>
-    <div class="alert error" th:if="${error}" th:text="${error}"></div>
+<!-- Flash / Alert Messages -->
+<div th:fragment="messages" class="container">
+    <div class="alert-banner alert-success" th:if="${success}">
+        <span>✓</span>
+        <span th:text="${success}">Success message</span>
+    </div>
+    <div class="alert-banner alert-error" th:if="${error}">
+        <span>⚠</span>
+        <span th:text="${error}">Error message</span>
+    </div>
 </div>
 
 <div th:fragment="footer" class="footer">

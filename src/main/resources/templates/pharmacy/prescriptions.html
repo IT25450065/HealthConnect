@@ -1,48 +1,124 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Prescriptions')}"></head>
+<head th:replace="~{fragments/layout :: head('Prescription Dispensing Queue')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <div class="container">
+    <!-- Page Header -->
     <div class="page-head">
-        <h1>Prescriptions</h1>
-        <a class="btn secondary" th:href="@{/pharmacy/prescriptions(filter='pending')}"
-           th:classappend="${filter == 'pending'} ? '' : ''">Pending only</a>
-        <a class="btn secondary" th:href="@{/pharmacy/prescriptions(filter='all')}">All</a>
+        <div class="page-head-content">
+            <h1>Prescription Dispensing Queue</h1>
+            <p>Doctor-issued prescriptions queue with automatic inventory stock deduction upon dispensing.</p>
+        </div>
     </div>
+
     <div th:replace="~{fragments/layout :: messages}"></div>
 
-    <div th:if="${prescriptions.isEmpty()}" class="empty">No prescriptions to show.</div>
+    <!-- Queue Filter Pills Bar (Screenshot 4) -->
+    <div class="filter-tabs-bar">
+        <div class="filter-pills">
+            <a th:href="@{/pharmacy/prescriptions?filter=pending}" 
+               class="filter-pill" 
+               th:classappend="${filter == 'pending' or filter == null} ? 'active' : ''">
+                ⌛ Pending Dispensing
+            </a>
+            <a th:href="@{/pharmacy/prescriptions?filter=dispensed}" 
+               class="filter-pill" 
+               th:classappend="${filter == 'dispensed'} ? 'active' : ''">
+                ✓ Dispensed Prescriptions
+            </a>
+            <a th:href="@{/pharmacy/prescriptions?filter=all}" 
+               class="filter-pill" 
+               th:classappend="${filter == 'all'} ? 'active' : ''">
+                All Prescriptions
+            </a>
+        </div>
+    </div>
 
-    <div class="table-wrap" th:unless="${prescriptions.isEmpty()}">
-        <table>
-            <thead>
-            <tr>
-                <th>Issued</th>
-                <th>Patient</th>
-                <th>Prescribed by</th>
-                <th>Medicines</th>
-                <th>Status</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="p : ${prescriptions}">
-                <td th:text="${p.issuedLabel}">date</td>
-                <td th:text="${p.patient.fullName}">patient</td>
-                <td th:text="${p.doctor.fullName}">doctor</td>
-                <td class="small">
-                    <span th:each="i, s : ${p.items}">
-                        <span th:text="${i.medicine.label}">m</span>
-                        &times;<span th:text="${i.quantity}">0</span><span th:unless="${s.last}">, </span>
+    <div th:if="${prescriptions.isEmpty()}" style="padding: 40px; text-align: center; color: var(--text-muted); background: #fff; border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); font-weight: 600;">
+        No prescriptions found matching the active filter.
+    </div>
+
+    <!-- Patient Prescription Cards Grid (Screenshot 4) -->
+    <div th:unless="${prescriptions.isEmpty()}">
+        <div class="patient-prescription-card" th:each="p : ${prescriptions}">
+            <!-- Patient & Doctor Card Header -->
+            <div class="patient-card-header">
+                <div class="patient-info">
+                    <h3>Patient: <span th:text="${p.patient.fullName}">Maria Garcia</span></h3>
+                    <p>
+                        Prescribed by <strong th:text="${p.doctor.fullName}">Dr. Robert Chen</strong> 
+                        on <span th:text="${p.issuedLabel}">Sep 7, 2026, 10:39 PM</span>
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="badge-pill" 
+                          th:classappend="${p.status.name() == 'DISPENSED' ? 'status-success' : (p.status.name() == 'CANCELLED' ? 'status-danger' : 'status-pending')}"
+                          th:text="${p.status.displayName}">
+                        Pending
                     </span>
-                </td>
-                <td><span class="badge" th:classappend="${p.status.name()}" th:text="${p.status.displayName}">status</span></td>
-                <td><a class="btn small" th:href="@{'/pharmacy/prescriptions/' + ${p.id}}">Open</a></td>
-            </tr>
-            </tbody>
-        </table>
+                    
+                    <form th:if="${p.pending}" method="post" th:action="@{'/pharmacy/prescriptions/' + ${p.id} + '/dispense'}" style="margin:0;">
+                        <button type="submit" class="btn">Dispense All Items</button>
+                    </form>
+                    <a th:unless="${p.pending}" th:href="@{'/pharmacy/prescriptions/' + ${p.id}}" class="btn btn-secondary btn-small">View Details</a>
+                </div>
+            </div>
+
+            <!-- Inner Prescription Items Table -->
+            <div class="table-wrap">
+                <table class="custom-table">
+                    <thead>
+                    <tr>
+                        <th>Prescribed Medicine</th>
+                        <th>Dosage</th>
+                        <th>Instructions</th>
+                        <th class="num">Qty Required</th>
+                        <th class="num">Inventory Stock</th>
+                        <th>Item Status</th>
+                        <th>Dispensing Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="i : ${p.items}">
+                        <td>
+                            <strong th:text="${i.medicine.name}">Metformin</strong>
+                            <span th:if="${i.medicine.strength != null and !i.medicine.strength.isBlank()}" th:text="' ' + ${i.medicine.strength}">850mg</span>
+                            <div class="code-pill" style="display: inline-block; margin-left: 4px;" th:text="'MED-' + ${i.medicine.id}">MED-1004</div>
+                        </td>
+                        <td th:text="${i.dosage}">850mg</td>
+                        <td th:text="${i.instructions != null and !i.instructions.isBlank() ? i.instructions : 'As directed'}">Once daily</td>
+                        <td class="num"><strong th:text="${i.quantity} + ' ' + (${i.medicine.unit != null ? i.medicine.unit : ''})">30 Tablets</strong></td>
+                        <td class="num">
+                            <span th:classappend="${i.medicine.stockQuantity < i.quantity ? 'text-danger' : ''}" 
+                                  th:text="${i.medicine.stockQuantity} + ' ' + (${i.medicine.unit != null ? i.medicine.unit : ''})">
+                                80 Tablets
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge-pill" 
+                                  th:classappend="${i.medicine.stockQuantity >= i.quantity ? 'status-normal' : 'status-out-of-stock'}"
+                                  th:text="${i.medicine.stockQuantity >= i.quantity ? 'In Stock' : 'Insufficient Stock'}">
+                                In Stock
+                            </span>
+                        </td>
+                        <td>
+                            <form th:if="${p.pending}" method="post" th:action="@{'/pharmacy/prescriptions/' + ${p.id} + '/dispense'}" style="margin:0;">
+                                <button type="submit" 
+                                        class="btn btn-small" 
+                                        th:classappend="${i.medicine.stockQuantity >= i.quantity ? '' : 'disabled'}"
+                                        th:disabled="${i.medicine.stockQuantity < i.quantity}">
+                                    Dispense Line Item
+                                </button>
+                            </form>
+                            <span th:unless="${p.pending}" style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;" th:text="${p.status.displayName}">Dispensed</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 

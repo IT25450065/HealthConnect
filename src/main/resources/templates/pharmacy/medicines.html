@@ -1,74 +1,133 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Medicine inventory')}"></head>
+<head th:replace="~{fragments/layout :: head(${lowStockOnly} ? 'Low & Out-of-Stock List' : 'Stock Management')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <div class="container">
+    <!-- Page Header -->
     <div class="page-head">
-        <h1>Medicine inventory</h1>
-        <a class="btn" th:href="@{/pharmacy/medicines/new}">Add a medicine</a>
+        <div class="page-head-content">
+            <h1 th:text="${lowStockOnly} ? 'Low & Out-of-Stock List' : 'Stock Management'">Stock Management</h1>
+            <p th:text="${lowStockOnly} ? 'Dedicated view listing all medicines currently below minimum threshold or at zero stock.' : 'Search medicines by name or code, receive batch deliveries, or create new inventory records.'">
+                Search medicines by name or code, receive batch deliveries, or create new inventory records.
+            </p>
+        </div>
+        <div>
+            <a class="btn" th:href="@{/pharmacy/medicines/new}">+ Add Medicine</a>
+        </div>
     </div>
+
     <div th:replace="~{fragments/layout :: messages}"></div>
 
-    <div class="alert error" th:if="${lowStockCount > 0}">
-        <strong th:text="${lowStockCount}">0</strong> medicine(s) are at or below their reorder threshold.
-    </div>
-
-    <div class="card">
+    <!-- Search Card (Screenshot 2) -->
+    <div class="search-card">
         <form method="get" th:action="@{/pharmacy/medicines}">
-            <div class="grid-2">
-                <div class="form-row">
-                    <label for="q">Search by name</label>
-                    <input type="text" id="q" name="q" th:value="${q}" placeholder="e.g. paracetamol">
-                </div>
-                <div class="form-row" style="align-self:end">
-                    <button class="btn" type="submit">Search</button>
-                    <a class="btn secondary" th:href="@{/pharmacy/medicines}">Clear</a>
-                </div>
-            </div>
+            <input type="hidden" name="lowStockOnly" th:value="${lowStockOnly}">
+            <input type="text" 
+                   class="search-input" 
+                   id="q" 
+                   name="q" 
+                   th:value="${q}" 
+                   placeholder="Search medicines by name or item code (e.g. Paracetamol, MED-1002)...">
         </form>
     </div>
 
-    <div th:if="${medicines.isEmpty()}" class="empty">No medicines match.</div>
+    <!-- Filter Pills Bar (Screenshot 3) -->
+    <div class="filter-tabs-bar">
+        <div class="filter-pills">
+            <a th:href="@{/pharmacy/medicines}" 
+               class="filter-pill" 
+               th:classappend="${!lowStockOnly} ? 'active' : ''">
+                All Inventory Items
+            </a>
+            <a th:href="@{/pharmacy/medicines?lowStockOnly=true}" 
+               class="filter-pill" 
+               th:classappend="${lowStockOnly} ? 'active' : ''">
+                Low & Out-of-Stock Only
+            </a>
+        </div>
+        <div th:if="${lowStockCount > 0}" style="font-size: 0.85rem; font-weight: 700; color: var(--warning);">
+            <span>⚠</span> <span th:text="${lowStockCount}">0</span> item(s) require replenishment
+        </div>
+    </div>
 
-    <div class="table-wrap" th:unless="${medicines.isEmpty()}">
-        <table>
-            <thead>
-            <tr>
-                <th>Medicine</th>
-                <th>Unit</th>
-                <th class="num">In stock</th>
-                <th class="num">Reorder at</th>
-                <th>Status</th>
-                <th>Quick stock change</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="m : ${medicines}">
-                <td th:text="${m.label}">name</td>
-                <td th:text="${m.unit}">unit</td>
-                <td class="num" th:text="${m.stockQuantity}">0</td>
-                <td class="num" th:text="${m.reorderThreshold}">0</td>
-                <td>
-                    <span class="badge low" th:if="${m.lowStock}">Low stock</span>
-                    <span class="badge ok" th:unless="${m.lowStock}">OK</span>
-                </td>
-                <td>
-                    <form class="inline-form" method="post" th:action="@{'/pharmacy/medicines/' + ${m.id} + '/adjust'}">
-                        <input type="hidden" name="delta" value="50">
-                        <button class="btn small" type="submit">+50</button>
-                    </form>
-                    <form class="inline-form" method="post" th:action="@{'/pharmacy/medicines/' + ${m.id} + '/adjust'}">
-                        <input type="hidden" name="delta" value="-10">
-                        <button class="btn small secondary" type="submit">-10</button>
-                    </form>
-                </td>
-                <td><a class="btn small secondary" th:href="@{'/pharmacy/medicines/' + ${m.id} + '/edit'}">Edit</a></td>
-            </tr>
-            </tbody>
-        </table>
+    <!-- Table Card Container -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <h3 th:text="${lowStockOnly} ? '⚠ Replenishment Required' : '🛡 Current Inventory Overview'">Current Inventory Overview</h3>
+        </div>
+
+        <div th:if="${medicines.isEmpty()}" style="padding: 40px; text-align: center; color: var(--text-muted); font-weight: 600;">
+            No inventory items match the selected filter.
+        </div>
+
+        <div class="table-wrap" th:unless="${medicines.isEmpty()}">
+            <table class="custom-table">
+                <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Medicine Name</th>
+                    <th>Unit</th>
+                    <th>Current Stock</th>
+                    <th>Min Threshold</th>
+                    <th th:if="${lowStockOnly}">Stock Deficit Gap</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${medicines}">
+                    <td>
+                        <span class="code-pill" th:text="'MED-' + ${m.id}">MED-1002</span>
+                    </td>
+                    <td>
+                        <strong th:text="${m.name}">Amoxicillin</strong>
+                        <span th:if="${m.strength != null and !m.strength.isBlank()}" th:text="' ' + ${m.strength}" style="color: var(--text-muted); font-weight: 500;">250mg</span>
+                    </td>
+                    <td th:text="${m.unit != null ? m.unit : 'Units'}">Capsules</td>
+                    <td>
+                        <span th:classappend="${m.stockQuantity == 0 ? 'text-danger' : (m.lowStock ? 'text-warning' : '')}"
+                              th:text="${m.stockQuantity} + ' ' + (${m.unit != null ? m.unit : ''})">
+                            12 Capsules
+                        </span>
+                    </td>
+                    <td th:text="${m.reorderThreshold} + ' ' + (${m.unit != null ? m.unit : ''})">30 Capsules</td>
+                    
+                    <td th:if="${lowStockOnly}">
+                        <span th:if="${m.stockQuantity < m.reorderThreshold}" 
+                              class="text-danger"
+                              th:text="'-' + (${m.reorderThreshold - m.stockQuantity}) + ' ' + (${m.unit != null ? m.unit : ''})">
+                            -18 Capsules
+                        </span>
+                        <span th:unless="${m.stockQuantity < m.reorderThreshold}" style="color: var(--text-muted);">
+                            0
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="badge-pill" 
+                              th:classappend="${m.stockQuantity == 0 ? 'status-out-of-stock' : (m.lowStock ? 'status-low-stock' : 'status-normal')}"
+                              th:text="${m.stockQuantity == 0 ? 'Out of Stock' : (m.lowStock ? 'Low Stock' : 'Normal')}">
+                            Normal
+                        </span>
+                    </td>
+                    
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <form method="post" th:action="@{'/pharmacy/medicines/' + ${m.id} + '/adjust'}" style="margin:0;">
+                                <input type="hidden" name="delta" value="50">
+                                <button type="submit" class="btn btn-small" th:classappend="${lowStockOnly or m.lowStock ? '' : 'btn-secondary'}">
+                                    <span th:text="${m.lowStock ? '📥 Receive Stock' : '+ Add Stock'}">+ Add Stock</span>
+                                </button>
+                            </form>
+                            <a th:href="@{'/pharmacy/medicines/' + ${m.id} + '/edit'}" class="btn btn-small btn-secondary">Edit</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
