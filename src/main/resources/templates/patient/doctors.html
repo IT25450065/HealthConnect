@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Find a doctor')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head"><h1>Find a doctor</h1></div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="card">
+        <form method="get" th:action="@{/patient/doctors}">
+            <div class="grid-2">
+                <div class="form-row">
+                    <label for="specialization">Filter by specialization</label>
+                    <select id="specialization" name="specialization">
+                        <option value="">All specializations</option>
+                        <option th:each="s : ${specializations}"
+                                th:value="${s}"
+                                th:text="${s}"
+                                th:selected="${s == selectedSpecialization}">Spec</option>
+                    </select>
+                </div>
+                <div class="form-row" style="align-self:end">
+                    <button class="btn" type="submit">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${doctors.isEmpty()}" class="empty">No doctors match that specialization.</div>
+
+    <div class="table-wrap" th:unless="${doctors.isEmpty()}">
+        <table>
+            <thead>
+            <tr>
+                <th>Doctor</th>
+                <th>Specialization</th>
+                <th>Qualification</th>
+                <th>Room</th>
+                <th>Available days</th>
+                <th>Hours</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="d : ${doctors}">
+                <td th:text="${d.fullName}">name</td>
+                <td th:text="${d.specialization}">spec</td>
+                <td th:text="${d.qualification}">qual</td>
+                <td th:text="${d.roomNo}">room</td>
+                <td th:text="${d.availableDaysLabel}">days</td>
+                <td th:text="${d.hoursLabel}">hours</td>
+                <td>
+                    <a class="btn small" th:href="@{/patient/appointments/book(doctorId=${d.id})}">Book</a>
+                    <a class="btn small secondary" th:href="@{/patient/video/book(doctorId=${d.id})}">Online</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

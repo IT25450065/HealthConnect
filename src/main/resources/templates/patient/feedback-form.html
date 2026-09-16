@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Leave feedback')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head"><h1>Leave feedback</h1></div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div th:if="${rateable.isEmpty()}" class="empty">
+        You have no completed visits left to rate.
+        <a th:href="@{/patient/feedback}">Back to my feedback</a>
+    </div>
+
+    <div class="card" th:unless="${rateable.isEmpty()}">
+        <form th:action="@{/patient/feedback/new}" th:object="${feedbackForm}" method="post">
+            <div class="form-row">
+                <label for="appointmentId">Which visit are you rating?</label>
+                <select id="appointmentId" th:field="*{appointmentId}">
+                    <option value="">-- select a completed visit --</option>
+                    <option th:each="a : ${rateable}"
+                            th:value="${a.id}"
+                            th:text="${a.dateTimeLabel} + ' - ' + ${a.doctor.fullName} + ' (' + ${a.doctor.specialization} + ')'">visit</option>
+                </select>
+                <div class="field-error" th:if="${#fields.hasErrors('appointmentId')}" th:errors="*{appointmentId}"></div>
+            </div>
+
+            <div class="form-row">
+                <label for="rating">Rating</label>
+                <select id="rating" th:field="*{rating}">
+                    <option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option>
+                    <option value="3">3 - Average</option>
+                    <option value="2">2 - Poor</option>
+                    <option value="1">1 - Very poor</option>
+                </select>
+                <div class="field-error" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}"></div>
+            </div>
+
+            <div class="form-row">
+                <label for="comments">Comments</label>
+                <textarea id="comments" th:field="*{comments}"
+                          placeholder="Tell us about your experience"></textarea>
+                <div class="field-error" th:if="${#fields.hasErrors('comments')}" th:errors="*{comments}"></div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn" type="submit">Submit feedback</button>
+                <a class="btn secondary" th:href="@{/patient/feedback}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

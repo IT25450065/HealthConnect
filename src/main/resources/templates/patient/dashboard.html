@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Patient dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head">
+        <h1>Welcome, <span th:text="${patient.fullName}">Patient</span></h1>
+        <a class="btn" th:href="@{/patient/appointments/book}">Book an appointment</a>
+    </div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="stat-row">
+        <div class="stat">
+            <div class="value" th:text="${upcoming.size()}">0</div>
+            <div class="label">Upcoming visits</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${totalAppointments}">0</div>
+            <div class="label">Total appointments</div>
+        </div>
+        <div class="stat amber">
+            <div class="value" th:text="${completedCount}">0</div>
+            <div class="label">Completed visits</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Your next appointments</h2>
+        <div th:if="${upcoming.isEmpty()}" class="empty">
+            You have no upcoming appointments.
+            <a th:href="@{/patient/doctors}">Find a doctor</a> to book one.
+        </div>
+        <div class="table-wrap" th:unless="${upcoming.isEmpty()}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Date and time</th>
+                    <th>Doctor</th>
+                    <th>Specialization</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${upcoming}">
+                    <td th:text="${a.dateTimeLabel}">date</td>
+                    <td th:text="${a.doctor.fullName}">doctor</td>
+                    <td th:text="${a.doctor.specialization}">spec</td>
+                    <td><span class="badge" th:classappend="${a.type.name()}" th:text="${a.type.displayName}">type</span></td>
+                    <td><span class="badge" th:classappend="${a.status.name()}" th:text="${a.status.displayName}">status</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Quick links</h2>
+        <p>
+            <a class="btn secondary" th:href="@{/patient/doctors}">Find a doctor</a>
+            <a class="btn secondary" th:href="@{/patient/video/book}">Book an online consultation</a>
+            <a class="btn secondary" th:href="@{/patient/records}">View my medical records</a>
+            <a class="btn secondary" th:href="@{/patient/feedback}">Leave feedback</a>
+        </p>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

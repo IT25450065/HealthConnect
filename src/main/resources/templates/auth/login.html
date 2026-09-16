@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Login')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="auth-wrap">
+    <div class="auth-brand">
+        <div class="logo">Health<span>Connect</span></div>
+        <div class="tag">Web-Based Medical Portal</div>
+    </div>
+
+    <div th:replace="~{fragments/layout :: messages}"></div>
+    <div class="alert info" th:if="${param.logout}">You have been logged out.</div>
+    <div class="alert warn" th:if="${param.required}">Please log in to continue.</div>
+
+    <div class="card">
+        <h2>Sign in</h2>
+        <form th:action="@{/login}" th:object="${loginForm}" method="post">
+            <div class="form-row">
+                <label for="email">Email address</label>
+                <input type="email" id="email" th:field="*{email}" autofocus>
+                <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
+            <div class="form-row">
+                <label for="password">Password</label>
+                <input type="password" id="password" th:field="*{password}">
+                <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+            </div>
+            <div class="form-actions">
+                <button class="btn" type="submit">Log in</button>
+                <a class="btn secondary" th:href="@{/register}">Register as a patient</a>
+            </div>
+        </form>
+        <p class="small" style="margin-bottom:0">
+            <a th:href="@{/forgot-password}">Forgotten your password?</a>
+        </p>
+    </div>
+
+    <div class="demo-box">
+        <strong>Demo accounts</strong> &mdash; password for all of them is <code>health123</code>
+        <table>
+            <tr><td>admin@healthconnect.lk</td><td>Hospital Administrator</td></tr>
+            <tr><td>cardiology@healthconnect.lk</td><td>Doctor</td></tr>
+            <tr><td>reception@healthconnect.lk</td><td>Receptionist</td></tr>
+            <tr><td>pharmacy@healthconnect.lk</td><td>Pharmacist</td></tr>
+            <tr><td>support@healthconnect.lk</td><td>Patient Relations Officer</td></tr>
+            <tr><td>amal@example.com</td><td>Patient</td></tr>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

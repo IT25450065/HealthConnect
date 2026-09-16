@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Pharmacy dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head"><h1>Pharmacy dashboard</h1></div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="stat-row">
+        <div class="stat amber">
+            <div class="value" th:text="${pendingCount}">0</div>
+            <div class="label">Prescriptions waiting</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${dispensedCount}">0</div>
+            <div class="label">Dispensed to date</div>
+        </div>
+        <div class="stat danger">
+            <div class="value" th:text="${lowStock.size()}">0</div>
+            <div class="label">Medicines at or below reorder level</div>
+        </div>
+    </div>
+
+    <div class="alert error" th:unless="${lowStock.isEmpty()}">
+        <strong>Low stock alert.</strong>
+        <span th:each="m, s : ${lowStock}">
+            <span th:text="${m.label}">name</span>
+            (<span th:text="${m.stockQuantity}">0</span> left)<span th:unless="${s.last}">, </span>
+        </span>
+        &mdash; <a th:href="@{/pharmacy/medicines}">update the inventory</a>.
+    </div>
+
+    <div class="card">
+        <h2>Prescriptions waiting to be dispensed</h2>
+        <div th:if="${pending.isEmpty()}" class="empty">Nothing is waiting. The queue is clear.</div>
+
+        <div class="table-wrap" th:unless="${pending.isEmpty()}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Issued</th>
+                    <th>Patient</th>
+                    <th>Prescribed by</th>
+                    <th class="num">Items</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${pending}">
+                    <td th:text="${p.issuedLabel}">date</td>
+                    <td th:text="${p.patient.fullName}">patient</td>
+                    <td th:text="${p.doctor.fullName}">doctor</td>
+                    <td class="num" th:text="${p.items.size()}">0</td>
+                    <td><a class="btn small" th:href="@{'/pharmacy/prescriptions/' + ${p.id}}">Open</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
