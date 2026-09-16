@@ -107,6 +107,9 @@ function setupEventListeners() {
 
   // Restock Form submit
   document.getElementById('restockForm').addEventListener('submit', handleRestockSubmit);
+
+  // Change Password Form submit
+  document.getElementById('changePasswordForm').addEventListener('submit', handleChangePasswordSubmit);
 }
 
 async function handleLogin(e) {
@@ -912,3 +915,92 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+/* ==========================================================================
+   CHANGE PASSWORD & EXPORT CSV FEATURES
+   ========================================================================== */
+
+function openChangePasswordModal() {
+  document.getElementById('currentPasswordInput').value = '';
+  document.getElementById('newPasswordInput').value = '';
+  document.getElementById('confirmPasswordInput').value = '';
+  document.getElementById('modalChangePassword').classList.remove('hidden');
+}
+
+function closeChangePasswordModal() {
+  document.getElementById('modalChangePassword').classList.add('hidden');
+}
+
+async function handleChangePasswordSubmit(e) {
+  e.preventDefault();
+  const currentPassword = document.getElementById('currentPasswordInput').value;
+  const newPassword = document.getElementById('newPasswordInput').value;
+  const confirmPassword = document.getElementById('confirmPasswordInput').value;
+
+  if (newPassword !== confirmPassword) {
+    showToast('New password and confirm password do not match.', 'error');
+    return;
+  }
+
+  if (newPassword.length < 6) {
+    showToast('New password must be at least 6 characters long.', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast(data.message, 'success');
+      closeChangePasswordModal();
+    } else {
+      showToast(data.message || 'Failed to update password.', 'error');
+    }
+  } catch (err) {
+    console.error('Error changing password:', err);
+    showToast('Network error while changing password.', 'error');
+  }
+}
+
+async function exportLowStockCSV() {
+  try {
+    const res = await fetch(`${API_BASE}/pharmacy/alerts?filter=all&sortBy=deficit`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+
+    if (!data.success || !data.medicines || data.medicines.length === 0) {
+      showToast('No low-stock items to export.', 'info');
+      return;
+    }
+
+    let csvContent = 'data:text/csv;charset=utf-8,Code,Medicine Name,Unit,Current Stock,Min Threshold,Deficit Gap,Status\n';
+    data.medicines.forEach(m => {
+      const status = m.stock_qty <= 0 ? 'Out of Stock' : 'Low Stock';
+      csvContent += `"${m.code}","${m.name}","${m.unit}",${m.stock_qty},${m.min_threshold},${m.deficit},"${status}"\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.setAttribute('download', `HealthConnect_Low_Stock_Report_${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast(`Exported ${data.medicines.length} low-stock alert items to CSV!`, 'success');
+  } catch (err) {
+    console.error('CSV Export Error:', err);
+    showToast('Failed to export CSV report.', 'error');
+  }
+}
+

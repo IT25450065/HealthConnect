@@ -381,6 +381,13 @@ function parseAndExecuteMemoryQuery(sql, params) {
       if (p) p.status = 'Dispensed';
       return { affectedRows: 1 };
     }
+    if (upperSql.includes('UPDATE PHARMACISTS SET PASSWORD_HASH =')) {
+      const newHash = params[0];
+      const uId = Number(params[1]);
+      const user = memoryDb.pharmacists.find(ph => ph.id === uId);
+      if (user) user.password_hash = newHash;
+      return { affectedRows: 1 };
+    }
   }
 
   return [];

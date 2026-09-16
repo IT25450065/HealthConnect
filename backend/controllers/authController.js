@@ -66,3 +66,45 @@ exports.getMe = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error verifying session.' });
   }
 };
+
+exports.changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const userId = req.user.id;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ success: false, message: 'Current password, new password, and confirm password are required.' });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ success: false, message: 'New password and confirm password do not match.' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'New password must be at least 6 characters long.' });
+    }
+
+    const users = await db.query('SELECT * FROM pharmacists WHERE id = ?', [userId]);
+    if (users.length === 0) {
+      return res.status(404).json({ success: false, message: 'Pharmacist account not found.' });
+    }
+
+    const user = users[0];
+    const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Incorrect current password.' });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+    await db.query('UPDATE pharmacists SET password_hash = ? WHERE id = ?', [newHash, userId]);
+
+    res.json({
+      success: true,
+      message: 'Password changed successfully! Please use your new password next time you log in.'
+    });
+  } catch (err) {
+    console.error('Change Password Error:', err);
+    res.status(500).json({ success: false, message: 'Server error updating password.' });
+  }
+};
+
