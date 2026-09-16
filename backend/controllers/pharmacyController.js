@@ -83,7 +83,7 @@ exports.addMedicine = async (req, res) => {
       message: `Medicine "${name}" created successfully.`,
       medicineId: newMedId,
       lowStockAlert: isLowStock,
-      alertMessage: isLowStock ? `⚠️ Low Stock Alert (PB07): Starting stock (${stockVal}) is at or below minimum threshold (${minVal}).` : null
+      alertMessage: isLowStock ? `⚠️ Low Stock Alert: Starting stock (${stockVal}) is at or below minimum threshold (${minVal}).` : null
     });
   } catch (err) {
     console.error('Error adding medicine:', err);
@@ -275,7 +275,7 @@ exports.dispensePrescriptionItem = async (req, res) => {
       success: true,
       message: `Successfully dispensed ${item.quantity} ${item.unit} of ${item.med_name}. Updated stock: ${newStock} ${item.unit}.`,
       lowStockAlert: triggerAlert,
-      alertMessage: triggerAlert ? `⚠️ Alert (PB07): Stock for ${item.med_name} (${newStock} ${item.unit}) is now at or below threshold (${item.min_threshold} ${item.unit}).` : null
+      alertMessage: triggerAlert ? `⚠️ Alert: Stock for ${item.med_name} (${newStock} ${item.unit}) is now at or below threshold (${item.min_threshold} ${item.unit}).` : null
     });
   } catch (err) {
     console.error('Error dispensing item:', err);
