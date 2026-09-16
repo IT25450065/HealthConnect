@@ -42,6 +42,7 @@
         <button id="btnUserProfile" class="user-avatar-btn" type="button" onclick="openUserProfileModal()" title="Pharmacist Account Details & Security">
           <div class="user-avatar-sm" id="userAvatarNav">Ph</div>
         </button>
+        <button id="btnLogoutNav" class="btn-logout-notch" onclick="handleLogout()">Logout</button>
       </div>
 
     </div>
@@ -509,8 +510,17 @@
       </div>
 
       <div class="modal-body" style="padding: 1.5rem;">
+        <!-- Top Action Bar: Quick Logout -->
+        <div style="margin-bottom: 1.25rem;">
+          <button id="btnLogoutModal" type="button" class="btn btn-secondary btn-block" onclick="handleLogout(); closeUserProfileModal();" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; color: var(--danger); border-color: rgba(255, 69, 58, 0.3); padding: 0.6rem 1rem;">
+            <span>🚪 Logout Pharmacist Session</span>
+          </button>
+        </div>
+
+        <div style="height: 1px; background: rgba(150, 150, 150, 0.2); margin: 1.25rem 0;"></div>
+
         <!-- Section 1: Update Profile Info (Name & Email) -->
-        <form id="panelUpdateProfileForm" style="margin-bottom: 1.5rem;">
+        <form id="panelUpdateProfileForm" style="margin-bottom: 1.25rem;">
           <div style="font-weight: 800; font-size: 0.95rem; color: var(--secondary); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 6px;">
             <span>👤 Pharmacist Profile Details</span>
           </div>
@@ -557,15 +567,6 @@
             Update Password
           </button>
         </form>
-
-        <div style="height: 1px; background: rgba(150, 150, 150, 0.2); margin: 1.25rem 0;"></div>
-
-        <!-- Section 3: Logout -->
-        <div>
-          <button id="btnLogout" type="button" class="btn btn-secondary btn-block" onclick="handleLogout(); closeUserProfileModal();" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; color: var(--danger); border-color: rgba(255, 69, 58, 0.3);">
-            <span>🚪 Logout Pharmacist Session</span>
-          </button>
-        </div>
       </div>
     </div>
   </div>

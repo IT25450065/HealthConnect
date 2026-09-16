@@ -73,9 +73,11 @@ function setupEventListeners() {
     });
   }
 
-  // Logout button
-  const logoutBtn = document.getElementById('btnLogout');
-  if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+  // Logout buttons (nav & modal)
+  ['btnLogout', 'btnLogoutModal', 'btnLogoutNav'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', handleLogout);
+  });
 
   // Tab navigation buttons
   document.querySelectorAll('.nav-btn').forEach(btn => {
