@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Patient history')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head">
+        <h1>Medical history</h1>
+        <a class="btn secondary" th:href="@{/doctor/dashboard}">Back to my queue</a>
+    </div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="card">
+        <h2 th:text="${patient.fullName}">Patient</h2>
+        <p class="muted small">
+            Blood group <strong th:text="${patient.bloodGroup} ?: '-'">-</strong> &middot;
+            Date of birth <strong th:text="${patient.dateOfBirthLabel}">-</strong> &middot;
+            Age <strong th:text="${patient.age} ?: '-'">-</strong> &middot;
+            Phone <strong th:text="${patient.user.phone} ?: '-'">-</strong>
+        </p>
+        <p class="muted small">
+            This screen is the <code>&lt;&lt;include&gt;&gt;</code> "View Patient Medical History"
+            from UC-02. It is a live query over every consultation attached to this patient's
+            past appointments &mdash; there is no separate records table.
+        </p>
+    </div>
+
+    <div th:if="${history.isEmpty()}" class="empty">
+        This patient has no previous consultations on record.
+    </div>
+
+    <div class="card" th:each="c : ${history}">
+        <div class="page-head">
+            <h3 th:text="${c.dateTimeLabel}">date</h3>
+            <span class="badge" th:text="${c.appointment.type.displayName}">type</span>
+        </div>
+        <p class="small muted" style="margin-top:-8px">
+            Seen by <strong th:text="${c.doctor.fullName}">doctor</strong>
+            (<span th:text="${c.doctor.specialization}">spec</span>)
+        </p>
+        <p th:if="${c.symptoms}"><strong>Symptoms:</strong> <span th:text="${c.symptoms}">symptoms</span></p>
+        <p><strong>Diagnosis:</strong> <span th:text="${c.diagnosis}">diagnosis</span></p>
+        <p th:if="${c.notes}"><strong>Notes:</strong> <span th:text="${c.notes}">notes</span></p>
+
+        <div th:each="p : ${c.prescriptions}">
+            <h4>
+                Prescription
+                <span class="badge" th:classappend="${p.status.name()}" th:text="${p.status.displayName}">status</span>
+            </h4>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr><th>Medicine</th><th>Dosage</th><th>Instructions</th><th class="num">Qty</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="i : ${p.items}">
+                        <td th:text="${i.medicine.label}">medicine</td>
+                        <td th:text="${i.dosage}">dosage</td>
+                        <td th:text="${i.instructions}">instructions</td>
+                        <td class="num" th:text="${i.quantity}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

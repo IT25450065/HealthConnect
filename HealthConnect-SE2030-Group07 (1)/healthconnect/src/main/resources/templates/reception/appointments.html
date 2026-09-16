@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Appointments')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head"><h1>All appointments</h1></div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="card">
+        <form method="get" th:action="@{/reception/appointments}">
+            <div class="grid-2">
+                <div class="form-row">
+                    <label for="status">Filter by status</label>
+                    <select id="status" name="status" onchange="this.form.submit()">
+                        <option value="">All statuses</option>
+                        <option th:each="s : ${statuses}"
+                                th:value="${s.name()}"
+                                th:text="${s.displayName}"
+                                th:selected="${s == selectedStatus}">status</option>
+                    </select>
+                </div>
+                <div class="form-row" style="align-self:end">
+                    <button class="btn" type="submit">Apply</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${appointments.isEmpty()}" class="empty">No appointments match that filter.</div>
+
+    <div class="table-wrap" th:unless="${appointments.isEmpty()}">
+        <table>
+            <thead>
+            <tr>
+                <th>Date and time</th>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Type</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${appointments}">
+                <td th:text="${a.dateTimeLabel}">date</td>
+                <td th:text="${a.patient.fullName}">patient</td>
+                <td th:text="${a.doctor.fullName}">doctor</td>
+                <td><span class="badge" th:classappend="${a.type.name()}" th:text="${a.type.displayName}">type</span></td>
+                <td class="small" th:text="${a.reason}">reason</td>
+                <td><span class="badge" th:classappend="${a.status.name()}" th:text="${a.status.displayName}">status</span></td>
+                <td>
+                    <form th:if="${a.status.name() == 'PENDING'}" class="inline-form" method="post"
+                          th:action="@{'/reception/appointments/' + ${a.id} + '/confirm'}">
+                        <button class="btn small" type="submit">Confirm</button>
+                    </form>
+                    <form th:if="${a.cancellable}" class="inline-form" method="post"
+                          th:action="@{'/reception/appointments/' + ${a.id} + '/cancel'}">
+                        <button class="btn small danger" type="submit">Cancel</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
