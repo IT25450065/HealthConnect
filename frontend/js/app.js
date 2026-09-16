@@ -59,15 +59,23 @@ function applyTheme(theme) {
 
 function setupEventListeners() {
   // Login form submit
-  document.getElementById('loginForm').addEventListener('submit', handleLogin);
-  document.getElementById('btnQuickFillDemo').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('loginEmail').value = 'pharmacist@healthconnect.com';
-    document.getElementById('loginPassword').value = 'password123';
-  });
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) loginForm.addEventListener('submit', handleLogin);
+
+  const quickFill = document.getElementById('btnQuickFillDemo');
+  if (quickFill) {
+    quickFill.addEventListener('click', (e) => {
+      e.preventDefault();
+      const emailEl = document.getElementById('loginEmail');
+      const passEl = document.getElementById('loginPassword');
+      if (emailEl) emailEl.value = 'pharmacist@healthconnect.com';
+      if (passEl) passEl.value = 'password123';
+    });
+  }
 
   // Logout button
-  document.getElementById('btnLogout').addEventListener('click', handleLogout);
+  const logoutBtn = document.getElementById('btnLogout');
+  if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
 
   // Tab navigation buttons
   document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -93,23 +101,28 @@ function setupEventListeners() {
 
   // Medicine live search input enter press & input event
   const searchInput = document.getElementById('medSearchInput');
-  searchInput.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') performMedicineSearch();
-  });
-  searchInput.addEventListener('input', () => {
-    if (searchInput.value.trim() === '') {
-      clearMedicineSearch();
-    }
-  });
+  if (searchInput) {
+    searchInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') performMedicineSearch();
+    });
+    searchInput.addEventListener('input', () => {
+      if (searchInput.value.trim() === '') {
+        clearMedicineSearch();
+      }
+    });
+  }
 
   // Add Medicine Form submit
-  document.getElementById('addMedicineForm').addEventListener('submit', handleAddMedicineSubmit);
+  const addMedForm = document.getElementById('addMedicineForm');
+  if (addMedForm) addMedForm.addEventListener('submit', handleAddMedicineSubmit);
 
   // Restock Form submit
-  document.getElementById('restockForm').addEventListener('submit', handleRestockSubmit);
+  const restockForm = document.getElementById('restockForm');
+  if (restockForm) restockForm.addEventListener('submit', handleRestockSubmit);
 
   // Change Password Form submit
-  document.getElementById('changePasswordForm').addEventListener('submit', handleChangePasswordSubmit);
+  const changePassForm = document.getElementById('changePasswordForm');
+  if (changePassForm) changePassForm.addEventListener('submit', handleChangePasswordSubmit);
 
   // Close profile dropdown menu when clicking outside
   document.addEventListener('click', (e) => {
