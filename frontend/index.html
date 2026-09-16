@@ -36,30 +36,11 @@
       <!-- Divider & Pharmacist Profile -->
       <div class="notch-divider"></div>
 
-      <div class="notch-user-section" style="position: relative;">
+      <div class="notch-user-section">
         <button id="btnThemeToggle" class="btn-theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch appearance" onclick="toggleTheme()">Theme</button>
-        
-        <!-- Profile Dropdown Trigger Button -->
-        <button id="btnProfileDropdown" class="btn-profile-dropdown" type="button" onclick="toggleProfileDropdown(event)" aria-haspopup="true" aria-expanded="false" title="Account settings">
-          <div class="user-avatar-sm" id="userAvatarNav">Ph</div>
-          <span id="userNameNav" class="profile-nav-name">Pharmacist</span>
-          <span class="dropdown-chevron">▼</span>
-        </button>
-
-        <!-- Dropdown Menu Popup -->
-        <div id="profileDropdownMenu" class="profile-dropdown-menu hidden">
-          <div class="dropdown-user-header">
-            <div id="menuUserName" class="dropdown-user-name">Pharmacist Account</div>
-            <div id="menuUserEmail" class="dropdown-user-email">pharmacist@healthconnect.com</div>
-          </div>
-          <div class="dropdown-divider"></div>
-          <button class="dropdown-item" onclick="openChangePasswordModal(); closeProfileDropdown();">
-            <span>🔑 Change Password</span>
-          </button>
-          <button id="btnLogout" class="dropdown-item danger" onclick="handleLogout(); closeProfileDropdown();">
-            <span>🚪 Logout</span>
-          </button>
-        </div>
+        <button id="btnChangePassword" class="btn-theme-toggle" type="button" title="Change Account Password" onclick="openChangePasswordModal()" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">🔑 Password</button>
+        <div class="user-avatar-sm" id="userAvatarNav" title="Pharmacist Account">Ph</div>
+        <button id="btnLogout" class="btn-logout-notch" onclick="handleLogout()">Logout</button>
       </div>
 
     </div>
@@ -209,6 +190,9 @@
               </button>
               <button class="btn btn-secondary btn-block" onclick="switchTab('alerts')">
                 View Deficit Reports
+              </button>
+              <button class="btn btn-secondary btn-block" onclick="openChangePasswordModal()">
+                🔑 Change Account Password
               </button>
             </div>
           </div>
