@@ -2990,3 +2990,156 @@ code { color: #4d4d4d !important; background: #efefef !important; border: 1px so
   .brand-wordmark { display: none; }
   .notch-logo-single { padding-right: 5px !important; }
 }
+
+/* ==========================================================================
+   PHARMACIST PROFILE DROPDOWN MENU
+   ========================================================================== */
+.btn-profile-dropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: inherit;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-profile-dropdown:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.user-avatar-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0071e3, #38bdf8);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 113, 227, 0.3);
+}
+
+.profile-nav-name {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-chevron {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.profile-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 240px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 8px;
+  z-index: 1000;
+  transform-origin: top right;
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .profile-dropdown-menu {
+  background: rgba(20, 20, 26, 0.92);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+}
+
+.dropdown-user-header {
+  padding: 8px 12px 10px;
+}
+
+.dropdown-user-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+[data-theme="dark"] .dropdown-user-name {
+  color: #ffffff;
+}
+
+.dropdown-user-email {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+  margin: 6px 0;
+}
+
+[data-theme="dark"] .dropdown-divider {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-dark);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+[data-theme="dark"] .dropdown-item {
+  color: #e2e8f0;
+}
+
+.dropdown-item:hover {
+  background: rgba(0, 113, 227, 0.08);
+  color: var(--primary);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.dropdown-item.danger:hover {
+  background: rgba(255, 69, 58, 0.12);
+  color: var(--danger);
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+

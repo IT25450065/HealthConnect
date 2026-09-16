@@ -110,6 +110,15 @@ function setupEventListeners() {
 
   // Change Password Form submit
   document.getElementById('changePasswordForm').addEventListener('submit', handleChangePasswordSubmit);
+
+  // Close profile dropdown menu when clicking outside
+  document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('profileDropdownMenu');
+    const trigger = document.getElementById('btnProfileDropdown');
+    if (dropdown && trigger && !trigger.contains(e.target) && !dropdown.contains(e.target)) {
+      closeProfileDropdown();
+    }
+  });
 }
 
 async function handleLogin(e) {
@@ -184,8 +193,32 @@ function showAppScreen() {
     const nameEl = document.getElementById('displayUserName');
     if (nameEl) nameEl.textContent = currentUser.name;
     const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-    const avatar = document.querySelector('.user-avatar') || document.querySelector('.user-avatar-sm');
+    const avatar = document.getElementById('userAvatarNav');
     if (avatar) avatar.textContent = initials || 'PH';
+
+    const navName = document.getElementById('userNameNav');
+    if (navName) navName.textContent = currentUser.name.split(' ')[0] || 'Pharmacist';
+
+    const menuName = document.getElementById('menuUserName');
+    if (menuName) menuName.textContent = currentUser.name;
+
+    const menuEmail = document.getElementById('menuUserEmail');
+    if (menuEmail) menuEmail.textContent = currentUser.email;
+  }
+}
+
+function toggleProfileDropdown(e) {
+  if (e) e.stopPropagation();
+  const dropdown = document.getElementById('profileDropdownMenu');
+  if (dropdown) {
+    dropdown.classList.toggle('hidden');
+  }
+}
+
+function closeProfileDropdown() {
+  const dropdown = document.getElementById('profileDropdownMenu');
+  if (dropdown) {
+    dropdown.classList.add('hidden');
   }
 }
 
