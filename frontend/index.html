@@ -38,8 +38,11 @@
 
       <div class="notch-user-section">
         <button id="btnThemeToggle" class="btn-theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch appearance" onclick="toggleTheme()">Theme</button>
-        <div class="user-avatar-sm">Ph</div>
-        <button id="btnLogout" class="btn-logout-notch">Logout</button>
+        <!-- Round Shape Profile Avatar Button -->
+        <button id="btnUserProfile" class="user-avatar-btn" type="button" onclick="openUserProfileModal()" title="Pharmacist Account Details & Security">
+          <div class="user-avatar-sm" id="userAvatarNav">Ph</div>
+        </button>
+        <button id="btnLogoutNav" class="btn-logout-notch" onclick="handleLogout()">Logout</button>
       </div>
 
     </div>
@@ -189,6 +192,9 @@
               </button>
               <button class="btn btn-secondary btn-block" onclick="switchTab('alerts')">
                 View Deficit Reports
+              </button>
+              <button class="btn btn-secondary btn-block" onclick="openChangePasswordModal()">
+                🔑 Change Account Password
               </button>
             </div>
           </div>
@@ -340,6 +346,7 @@
           <h1 class="page-title">Low & Out-of-Stock List</h1>
           <p class="page-subtitle">Dedicated view listing all medicines currently below minimum threshold or at zero stock.</p>
         </div>
+        <button class="btn btn-radial-glow" onclick="exportLowStockCSV()">📥 Export Deficit CSV</button>
       </div>
 
       <!-- Filters & Sorting Bar -->
@@ -485,6 +492,82 @@
           <button type="submit" class="btn btn-success">Confirm Stock Addition</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PHARMACIST ACCOUNT & SECURITY PANEL -->
+  <div id="modalUserProfile" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 480px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="user-avatar-sm" id="modalUserAvatar" style="width: 38px; height: 38px; font-size: 0.95rem; font-weight: 800;">Ph</div>
+          <div>
+            <h3 id="panelUserName" style="font-size: 1.15rem; font-weight: 800; margin: 0;">Pharmacist Account</h3>
+            <div id="panelUserEmail" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500; margin-top: 2px;">pharmacist@healthconnect.com</div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeUserProfileModal()">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.5rem;">
+        <!-- Top Action Bar: Quick Logout -->
+        <div style="margin-bottom: 1.25rem;">
+          <button id="btnLogoutModal" type="button" class="btn btn-secondary btn-block" onclick="handleLogout(); closeUserProfileModal();" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; color: var(--danger); border-color: rgba(255, 69, 58, 0.3); padding: 0.6rem 1rem;">
+            <span>🚪 Logout Pharmacist Session</span>
+          </button>
+        </div>
+
+        <div style="height: 1px; background: rgba(150, 150, 150, 0.2); margin: 1.25rem 0;"></div>
+
+        <!-- Section 1: Update Profile Info (Name & Email) -->
+        <form id="panelUpdateProfileForm" style="margin-bottom: 1.25rem;">
+          <div style="font-weight: 800; font-size: 0.95rem; color: var(--secondary); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 6px;">
+            <span>👤 Pharmacist Profile Details</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-size: 0.8rem;">Full Name *</label>
+            <input type="text" id="panelInputName" class="form-control" placeholder="e.g. Dr. Sarah Jenkins" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label" style="font-size: 0.8rem;">Email Address *</label>
+            <input type="email" id="panelInputEmail" class="form-control" placeholder="e.g. pharmacist@healthconnect.com" required>
+          </div>
+
+          <button type="submit" class="btn btn-radial-glow btn-block" style="padding: 0.6rem 1rem; font-weight: 700; font-size: 0.85rem;">
+            Save Profile Details
+          </button>
+        </form>
+
+        <div style="height: 1px; background: rgba(150, 150, 150, 0.2); margin: 1.25rem 0;"></div>
+
+        <!-- Section 2: Security - Change Password -->
+        <form id="panelChangePasswordForm">
+          <div style="font-weight: 800; font-size: 0.95rem; color: var(--secondary); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 6px;">
+            <span>🔑 Change Account Password</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-size: 0.8rem;">Current Password *</label>
+            <input type="password" id="panelCurrentPassword" class="form-control" placeholder="Enter current password" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-size: 0.8rem;">New Password *</label>
+            <input type="password" id="panelNewPassword" class="form-control" minlength="6" placeholder="Enter new password (min 6 characters)" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-size: 0.8rem;">Confirm New Password *</label>
+            <input type="password" id="panelConfirmPassword" class="form-control" minlength="6" placeholder="Re-enter new password" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="padding: 0.6rem 1rem; font-weight: 700; font-size: 0.85rem;">
+            Update Password
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 

@@ -59,15 +59,25 @@ function applyTheme(theme) {
 
 function setupEventListeners() {
   // Login form submit
-  document.getElementById('loginForm').addEventListener('submit', handleLogin);
-  document.getElementById('btnQuickFillDemo').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('loginEmail').value = 'pharmacist@healthconnect.com';
-    document.getElementById('loginPassword').value = 'password123';
-  });
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) loginForm.addEventListener('submit', handleLogin);
 
-  // Logout button
-  document.getElementById('btnLogout').addEventListener('click', handleLogout);
+  const quickFill = document.getElementById('btnQuickFillDemo');
+  if (quickFill) {
+    quickFill.addEventListener('click', (e) => {
+      e.preventDefault();
+      const emailEl = document.getElementById('loginEmail');
+      const passEl = document.getElementById('loginPassword');
+      if (emailEl) emailEl.value = 'pharmacist@healthconnect.com';
+      if (passEl) passEl.value = 'password123';
+    });
+  }
+
+  // Logout buttons (nav & modal)
+  ['btnLogout', 'btnLogoutModal', 'btnLogoutNav'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', handleLogout);
+  });
 
   // Tab navigation buttons
   document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -93,20 +103,41 @@ function setupEventListeners() {
 
   // Medicine live search input enter press & input event
   const searchInput = document.getElementById('medSearchInput');
-  searchInput.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') performMedicineSearch();
-  });
-  searchInput.addEventListener('input', () => {
-    if (searchInput.value.trim() === '') {
-      clearMedicineSearch();
-    }
-  });
+  if (searchInput) {
+    searchInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') performMedicineSearch();
+    });
+    searchInput.addEventListener('input', () => {
+      if (searchInput.value.trim() === '') {
+        clearMedicineSearch();
+      }
+    });
+  }
 
   // Add Medicine Form submit
-  document.getElementById('addMedicineForm').addEventListener('submit', handleAddMedicineSubmit);
+  const addMedForm = document.getElementById('addMedicineForm');
+  if (addMedForm) addMedForm.addEventListener('submit', handleAddMedicineSubmit);
 
   // Restock Form submit
-  document.getElementById('restockForm').addEventListener('submit', handleRestockSubmit);
+  const restockForm = document.getElementById('restockForm');
+  if (restockForm) restockForm.addEventListener('submit', handleRestockSubmit);
+
+  // Change Password Form submit
+  const changePassForm = document.getElementById('changePasswordForm') || document.getElementById('panelChangePasswordForm');
+  if (changePassForm) changePassForm.addEventListener('submit', handlePanelChangePasswordSubmit);
+
+  // Update Profile Form submit
+  const profileForm = document.getElementById('panelUpdateProfileForm');
+  if (profileForm) profileForm.addEventListener('submit', handlePanelUpdateProfileSubmit);
+
+  // Close profile dropdown menu when clicking outside
+  document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('profileDropdownMenu');
+    const trigger = document.getElementById('btnProfileDropdown');
+    if (dropdown && trigger && !trigger.contains(e.target) && !dropdown.contains(e.target)) {
+      closeProfileDropdown();
+    }
+  });
 }
 
 async function handleLogin(e) {
@@ -181,8 +212,32 @@ function showAppScreen() {
     const nameEl = document.getElementById('displayUserName');
     if (nameEl) nameEl.textContent = currentUser.name;
     const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-    const avatar = document.querySelector('.user-avatar') || document.querySelector('.user-avatar-sm');
+    const avatar = document.getElementById('userAvatarNav');
     if (avatar) avatar.textContent = initials || 'PH';
+
+    const navName = document.getElementById('userNameNav');
+    if (navName) navName.textContent = currentUser.name.split(' ')[0] || 'Pharmacist';
+
+    const menuName = document.getElementById('menuUserName');
+    if (menuName) menuName.textContent = currentUser.name;
+
+    const menuEmail = document.getElementById('menuUserEmail');
+    if (menuEmail) menuEmail.textContent = currentUser.email;
+  }
+}
+
+function toggleProfileDropdown(e) {
+  if (e) e.stopPropagation();
+  const dropdown = document.getElementById('profileDropdownMenu');
+  if (dropdown) {
+    dropdown.classList.toggle('hidden');
+  }
+}
+
+function closeProfileDropdown() {
+  const dropdown = document.getElementById('profileDropdownMenu');
+  if (dropdown) {
+    dropdown.classList.add('hidden');
   }
 }
 
@@ -912,3 +967,165 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+/* ==========================================================================
+   CHANGE PASSWORD & EXPORT CSV FEATURES
+   ========================================================================== */
+
+function openUserProfileModal() {
+  const currentPassEl = document.getElementById('panelCurrentPassword');
+  const newPassEl = document.getElementById('panelNewPassword');
+  const confirmPassEl = document.getElementById('panelConfirmPassword');
+  if (currentPassEl) currentPassEl.value = '';
+  if (newPassEl) newPassEl.value = '';
+  if (confirmPassEl) confirmPassEl.value = '';
+
+  if (currentUser) {
+    const nameEl = document.getElementById('panelUserName');
+    const emailEl = document.getElementById('panelUserEmail');
+    const avatarEl = document.getElementById('modalUserAvatar');
+    const inputName = document.getElementById('panelInputName');
+    const inputEmail = document.getElementById('panelInputEmail');
+
+    if (nameEl) nameEl.textContent = currentUser.name;
+    if (emailEl) emailEl.textContent = currentUser.email;
+    if (inputName) inputName.value = currentUser.name;
+    if (inputEmail) inputEmail.value = currentUser.email;
+
+    if (avatarEl) {
+      const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      avatarEl.textContent = initials || 'PH';
+    }
+  }
+
+  const modal = document.getElementById('modalUserProfile');
+  if (modal) modal.classList.remove('hidden');
+}
+
+async function handlePanelUpdateProfileSubmit(e) {
+  e.preventDefault();
+  const name = document.getElementById('panelInputName').value.trim();
+  const email = document.getElementById('panelInputEmail').value.trim();
+
+  if (!name || !email) {
+    showToast('Name and email address are required.', 'error');
+    return;
+  }
+
+  try {
+    const tokenVal = authToken || localStorage.getItem('hc_pharmacist_token');
+    const res = await fetch(`${API_BASE}/auth/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${tokenVal}`
+      },
+      body: JSON.stringify({ name, email })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      currentUser.name = data.user.name;
+      currentUser.email = data.user.email;
+      showAppScreen();
+      showToast(data.message, 'success');
+    } else {
+      showToast(data.message || 'Failed to update profile.', 'error');
+    }
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    showToast('Network error while updating profile details.', 'error');
+  }
+}
+
+function closeUserProfileModal() {
+  const modal = document.getElementById('modalUserProfile');
+  if (modal) modal.classList.add('hidden');
+}
+
+function openChangePasswordModal() {
+  openUserProfileModal();
+}
+
+function closeChangePasswordModal() {
+  closeUserProfileModal();
+}
+
+async function handlePanelChangePasswordSubmit(e) {
+  e.preventDefault();
+  const currentPassword = (document.getElementById('panelCurrentPassword') || document.getElementById('currentPasswordInput')).value;
+  const newPassword = (document.getElementById('panelNewPassword') || document.getElementById('newPasswordInput')).value;
+  const confirmPassword = (document.getElementById('panelConfirmPassword') || document.getElementById('confirmPasswordInput')).value;
+
+  if (newPassword !== confirmPassword) {
+    showToast('New password and confirm password do not match.', 'error');
+    return;
+  }
+
+  if (newPassword.length < 6) {
+    showToast('New password must be at least 6 characters long.', 'error');
+    return;
+  }
+
+  try {
+    const tokenVal = authToken || localStorage.getItem('hc_pharmacist_token');
+    const res = await fetch(`${API_BASE}/auth/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${tokenVal}`
+      },
+      body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast(data.message, 'success');
+      closeUserProfileModal();
+    } else {
+      showToast(data.message || 'Failed to update password.', 'error');
+    }
+  } catch (err) {
+    console.error('Error changing password:', err);
+    showToast('Network error while changing password.', 'error');
+  }
+}
+
+async function handleChangePasswordSubmit(e) {
+  return handlePanelChangePasswordSubmit(e);
+}
+
+async function exportLowStockCSV() {
+  try {
+    const res = await fetch(`${API_BASE}/pharmacy/alerts?filter=all&sortBy=deficit`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+
+    if (!data.success || !data.medicines || data.medicines.length === 0) {
+      showToast('No low-stock items to export.', 'info');
+      return;
+    }
+
+    let csvContent = 'data:text/csv;charset=utf-8,Code,Medicine Name,Unit,Current Stock,Min Threshold,Deficit Gap,Status\n';
+    data.medicines.forEach(m => {
+      const status = m.stock_qty <= 0 ? 'Out of Stock' : 'Low Stock';
+      csvContent += `"${m.code}","${m.name}","${m.unit}",${m.stock_qty},${m.min_threshold},${m.deficit},"${status}"\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.setAttribute('download', `HealthConnect_Low_Stock_Report_${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast(`Exported ${data.medicines.length} low-stock alert items to CSV!`, 'success');
+  } catch (err) {
+    console.error('CSV Export Error:', err);
+    showToast('Failed to export CSV report.', 'error');
+  }
+}
+

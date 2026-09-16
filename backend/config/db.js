@@ -154,6 +154,11 @@ function parseAndExecuteMemoryQuery(sql, params) {
   if (upperSql.startsWith('SELECT')) {
     // 1. Pharmacists by email
     if (upperSql.includes('FROM PHARMACISTS WHERE EMAIL =')) {
+      if (upperSql.includes('AND ID !=')) {
+        const email = params[0];
+        const uId = Number(params[1]);
+        return memoryDb.pharmacists.filter(p => p.email.toLowerCase() === String(email).toLowerCase() && p.id !== uId);
+      }
       const email = params[0];
       return memoryDb.pharmacists.filter(p => p.email.toLowerCase() === String(email).toLowerCase());
     }
@@ -379,6 +384,24 @@ function parseAndExecuteMemoryQuery(sql, params) {
       const pId = Number(params[0]);
       const p = memoryDb.prescriptions.find(pr => pr.id === pId);
       if (p) p.status = 'Dispensed';
+      return { affectedRows: 1 };
+    }
+    if (upperSql.includes('UPDATE PHARMACISTS SET PASSWORD_HASH =')) {
+      const newHash = params[0];
+      const uId = Number(params[1]);
+      const user = memoryDb.pharmacists.find(ph => ph.id === uId);
+      if (user) user.password_hash = newHash;
+      return { affectedRows: 1 };
+    }
+    if (upperSql.includes('UPDATE PHARMACISTS SET NAME =')) {
+      const newName = params[0];
+      const newEmail = params[1];
+      const uId = Number(params[2]);
+      const user = memoryDb.pharmacists.find(ph => ph.id === uId);
+      if (user) {
+        user.name = newName;
+        user.email = newEmail;
+      }
       return { affectedRows: 1 };
     }
   }
