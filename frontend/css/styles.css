@@ -1761,7 +1761,7 @@ h1, h2, h3, h4, .alerts-title, .alert-med-name, .patient-info h4, .page-title, .
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 3000 !important;
   animation: fadeIn 0.2s ease;
 }
 

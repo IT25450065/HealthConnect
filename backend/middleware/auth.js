@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'healthconnect_pharmacy_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'healthconnect_pharmacist_super_secret_key_2026';
 
 function verifyToken(req, res, next) {
   const authHeader = req.headers['authorization'] || req.headers['x-auth-token'];
