@@ -1,33 +1,39 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Reception dashboard')}"></head>
+<head th:replace="~{fragments/layout :: head('Reception Dashboard')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <div class="container">
     <div class="page-head">
-        <h1>Reception dashboard</h1>
-        <a class="btn" th:href="@{/reception/appointments}">Manage all appointments</a>
+        <div>
+            <h1>Reception Dashboard</h1>
+            <p class="muted">Overview of today's appointment schedule and patient arrivals</p>
+        </div>
+        <a class="btn" th:href="@{/reception/appointments}">Manage All Appointments</a>
     </div>
     <div th:replace="~{fragments/layout :: messages}"></div>
 
     <div class="stat-row">
         <div class="stat amber">
+            <div class="label">AWAITING CONFIRMATION</div>
             <div class="value" th:text="${pendingCount}">0</div>
-            <div class="label">Awaiting confirmation</div>
+            <div class="stat-card-badge">Pending Review</div>
         </div>
         <div class="stat">
+            <div class="label">CONFIRMED APPOINTMENTS</div>
             <div class="value" th:text="${confirmedCount}">0</div>
-            <div class="label">Confirmed</div>
+            <div class="stat-card-badge">Ready for Visit</div>
         </div>
         <div class="stat">
+            <div class="label">SCHEDULED TODAY</div>
             <div class="value" th:text="${today.size()}">0</div>
-            <div class="label">Scheduled today</div>
+            <div class="stat-card-badge">Today's Queue</div>
         </div>
     </div>
 
     <div class="card">
-        <h2>Today's schedule</h2>
+        <h2>Today's Appointment Schedule</h2>
         <div th:if="${today.isEmpty()}" class="empty">No appointments are scheduled for today.</div>
 
         <div class="table-wrap" th:unless="${today.isEmpty()}">
@@ -44,7 +50,7 @@
                 <tbody>
                 <tr th:each="a : ${today}">
                     <td th:text="${a.timeLabel}">time</td>
-                    <td th:text="${a.patient.fullName}">patient</td>
+                    <td style="font-weight: 600;" th:text="${a.patient.fullName}">patient</td>
                     <td th:text="${a.doctor.fullName}">doctor</td>
                     <td><span class="badge" th:classappend="${a.type.name()}" th:text="${a.type.displayName}">type</span></td>
                     <td><span class="badge" th:classappend="${a.status.name()}" th:text="${a.status.displayName}">status</span></td>
