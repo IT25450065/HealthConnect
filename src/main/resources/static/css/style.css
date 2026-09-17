@@ -101,7 +101,7 @@ p {
 a {
     color: var(--apple-blue);
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 a:hover {
@@ -135,7 +135,13 @@ a:hover {
     border: 1px solid var(--border-glass);
     border-radius: 20px;
     box-shadow: var(--shadow-glass);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.8);
 }
 
 .glass-dark {
@@ -146,6 +152,12 @@ a:hover {
     border-radius: 20px;
     box-shadow: var(--shadow-glass-dark);
     color: #f5f5f7;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-dark:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.3);
 }
 
 .glass-dark h1, .glass-dark h2, .glass-dark h3, .glass-dark p {
@@ -161,7 +173,13 @@ a:hover {
     box-shadow: var(--shadow-glass);
     padding: 28px;
     margin-bottom: 24px;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.78);
 }
 
 /* ------------------------------ Navigation Bar ------------------------------ */
@@ -188,7 +206,13 @@ a:hover {
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.09);
+    background: rgba(255, 255, 255, 0.85);
 }
 
 .navbar .brand {
@@ -201,6 +225,11 @@ a:hover {
     gap: 6px;
     margin-right: 12px;
     letter-spacing: -0.01em;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar .brand:hover {
+    transform: scale(1.03);
 }
 
 .navbar .brand span {
@@ -214,13 +243,14 @@ a:hover {
     border-radius: 980px;
     font-size: 14px;
     font-weight: 500;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
 }
 
 .navbar a.nav-link:hover, .navbar a.nav-link.active {
     color: var(--apple-text-primary);
     background: rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
 }
 
 .navbar .spacer {
@@ -239,7 +269,7 @@ a:hover {
     font-weight: 600;
 }
 
-/* ------------------------------ Buttons (Apple Pill Style) ------------------------------ */
+/* ------------------------------ Buttons (Apple Pill Style & Pop Effect) ------------------------------ */
 
 .btn {
     display: inline-flex;
@@ -261,13 +291,13 @@ a:hover {
 
 .btn:hover {
     background: var(--apple-blue-hover);
-    transform: scale(1.02);
-    box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 18px rgba(0, 113, 227, 0.38);
     color: #ffffff !important;
 }
 
 .btn:active {
-    transform: scale(0.98);
+    transform: translateY(0) scale(0.98);
 }
 
 .btn.secondary {
@@ -279,8 +309,9 @@ a:hover {
 
 .btn.secondary:hover {
     background: rgba(0, 113, 227, 0.14);
-    transform: scale(1.02);
+    transform: translateY(-2px) scale(1.03);
     color: var(--apple-blue) !important;
+    box-shadow: 0 4px 14px rgba(0, 113, 227, 0.15);
 }
 
 .btn.danger {
@@ -291,8 +322,8 @@ a:hover {
 
 .btn.danger:hover {
     background: #e03126;
-    transform: scale(1.02);
-    box-shadow: 0 4px 14px rgba(255, 59, 48, 0.35);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 18px rgba(255, 59, 48, 0.38);
 }
 
 .btn.small {
@@ -337,12 +368,13 @@ a:hover {
     border-radius: 20px;
     padding: 24px;
     box-shadow: var(--shadow-glass);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .stat:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.09);
+    background: rgba(255, 255, 255, 0.85);
 }
 
 .stat .value {
@@ -372,6 +404,12 @@ a:hover {
     color: var(--apple-text-secondary);
     margin-top: 10px;
     border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.stat:hover .stat-card-badge {
+    background: rgba(0, 113, 227, 0.08);
+    color: var(--apple-blue);
 }
 
 .stat.amber .value {
@@ -409,13 +447,14 @@ a:hover {
     gap: 16px;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .alert-item-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    transform: translateY(-3px) scale(1.008);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     background: #ffffff;
+    border-color: rgba(0, 113, 227, 0.18);
 }
 
 .code-pill {
@@ -440,15 +479,16 @@ a:hover {
     margin-bottom: 12px;
     text-decoration: none;
     color: inherit;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
 }
 
 .shortcut-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.01);
     background: #ffffff;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 113, 227, 0.2);
 }
 
 .shortcut-card .icon-box {
@@ -462,6 +502,13 @@ a:hover {
     justify-content: center;
     font-size: 20px;
     flex-shrink: 0;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shortcut-card:hover .icon-box {
+    transform: scale(1.08);
+    background: var(--apple-blue);
+    color: #ffffff;
 }
 
 /* ------------------------------ Alerts ------------------------------ */
@@ -474,6 +521,12 @@ a:hover {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     animation: pageEntrance 0.3s ease-out forwards;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.alert:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
 .alert.success {
@@ -500,22 +553,24 @@ a:hover {
     color: #a85200;
 }
 
-/* ------------------------------ Tables ------------------------------ */
+/* ------------------------------ Interactive Table Rows Pop/Lift Effect ------------------------------ */
 
 .table-wrap {
     overflow-x: auto;
     border-radius: 16px;
+    padding: 4px;
 }
 
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0 6px;
     text-align: left;
     font-size: 15px;
 }
 
 th {
-    padding: 14px 18px;
+    padding: 12px 18px;
     font-size: 13px;
     font-weight: 600;
     color: var(--apple-text-secondary);
@@ -524,20 +579,41 @@ th {
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+tbody tr {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 14px;
+}
+
 td {
     padding: 16px 18px;
     color: var(--apple-text-primary);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    background: rgba(255, 255, 255, 0.55);
+    border-top: 1px solid rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
     vertical-align: middle;
-    transition: background 0.2s ease;
+    transition: background 0.25s ease, border-color 0.25s ease;
 }
 
-tr:last-child td {
-    border-bottom: none;
+td:first-child {
+    border-left: 1px solid rgba(0, 0, 0, 0.03);
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
 }
 
-tr:hover td {
-    background: rgba(255, 255, 255, 0.4);
+td:last-child {
+    border-right: 1px solid rgba(0, 0, 0, 0.03);
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+}
+
+tbody tr:hover {
+    transform: translateY(-3px) scale(1.004);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+}
+
+tbody tr:hover td {
+    background: #ffffff !important;
+    border-color: rgba(0, 113, 227, 0.15);
 }
 
 td.num, th.num {
@@ -554,6 +630,11 @@ td.num, th.num {
     font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.badge:hover {
+    transform: scale(1.05);
 }
 
 .badge.ok, .badge.DISPENSED, .badge.CONFIRMED {
@@ -602,7 +683,7 @@ textarea {
     font-size: 15px;
     font-family: inherit;
     color: var(--apple-text-primary);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
@@ -611,7 +692,8 @@ input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--apple-blue);
     background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 113, 227, 0.18);
 }
 
 .field-error {
@@ -750,6 +832,12 @@ input:focus, select:focus, textarea:focus {
     padding: 20px 24px;
     font-size: 13px;
     color: var(--apple-text-secondary);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.demo-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
 }
 
 .demo-box strong {
