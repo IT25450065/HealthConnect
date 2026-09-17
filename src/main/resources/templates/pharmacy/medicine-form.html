@@ -4,10 +4,13 @@
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-<div class="container">
+<div class="container" style="max-width: 800px;">
     <div class="page-head">
-        <h1 th:text="${medicineForm.id == null} ? 'Add a medicine' : 'Update medicine'">Medicine</h1>
-        <a class="btn secondary" th:href="@{/pharmacy/medicines}">Back to inventory</a>
+        <div>
+            <h1 th:text="${medicineForm.id == null} ? 'Add New Medicine' : 'Update Medicine'">Medicine</h1>
+            <p class="muted">Enter inventory details and reorder thresholds</p>
+        </div>
+        <a class="btn secondary" th:href="@{/pharmacy/medicines}">&larr; Back to Inventory</a>
     </div>
     <div th:replace="~{fragments/layout :: messages}"></div>
 
@@ -15,41 +18,44 @@
         <form th:action="@{/pharmacy/medicines/save}" th:object="${medicineForm}" method="post">
             <input type="hidden" th:field="*{id}">
 
-            <div class="grid-3">
-                <div class="form-row">
-                    <label for="name">Name *</label>
-                    <input type="text" id="name" th:field="*{name}">
-                    <div class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-                </div>
+            <div class="form-row">
+                <label for="name">Medicine Name *</label>
+                <input type="text" id="name" th:field="*{name}" placeholder="e.g. Paracetamol">
+                <div class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+            </div>
+
+            <div class="grid-2">
                 <div class="form-row">
                     <label for="strength">Strength</label>
-                    <input type="text" id="strength" th:field="*{strength}" placeholder="500mg">
+                    <input type="text" id="strength" th:field="*{strength}" placeholder="e.g. 500mg">
                     <div class="field-error" th:if="${#fields.hasErrors('strength')}" th:errors="*{strength}"></div>
                 </div>
                 <div class="form-row">
                     <label for="unit">Unit</label>
-                    <input type="text" id="unit" th:field="*{unit}" placeholder="tablets">
+                    <input type="text" id="unit" th:field="*{unit}" placeholder="e.g. tablets, capsules, ml">
                     <div class="field-error" th:if="${#fields.hasErrors('unit')}" th:errors="*{unit}"></div>
                 </div>
+            </div>
+
+            <div class="grid-2">
                 <div class="form-row">
-                    <label for="stockQuantity">Quantity in stock *</label>
+                    <label for="stockQuantity">Quantity in Stock *</label>
                     <input type="number" min="0" id="stockQuantity" th:field="*{stockQuantity}">
                     <div class="field-error" th:if="${#fields.hasErrors('stockQuantity')}" th:errors="*{stockQuantity}"></div>
                 </div>
                 <div class="form-row">
-                    <label for="reorderThreshold">Reorder threshold *</label>
+                    <label for="reorderThreshold">Reorder Threshold *</label>
                     <input type="number" min="0" id="reorderThreshold" th:field="*{reorderThreshold}">
                     <div class="field-error" th:if="${#fields.hasErrors('reorderThreshold')}" th:errors="*{reorderThreshold}"></div>
                 </div>
             </div>
 
             <p class="muted small">
-                A medicine is flagged as low stock when the quantity in stock falls to or below
-                the reorder threshold.
+                A medicine is flagged with a low stock alert when stock falls to or below the specified reorder threshold.
             </p>
 
             <div class="form-actions">
-                <button class="btn" type="submit">Save</button>
+                <button class="btn" type="submit">Save Medicine</button>
                 <a class="btn secondary" th:href="@{/pharmacy/medicines}">Cancel</a>
             </div>
         </form>

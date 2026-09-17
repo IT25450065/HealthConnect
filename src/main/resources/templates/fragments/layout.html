@@ -22,85 +22,89 @@
 
 <body>
 
-<nav th:fragment="navbar" class="navbar">
-    <a class="brand" th:href="@{/}">Health<span>Connect</span></a>
+<div class="navbar-wrapper" th:fragment="navbar">
+    <nav class="navbar">
+        <a class="brand" th:href="@{/}">Health<span>Connect</span></a>
 
-    <th:block th:if="${currentUser == null}">
-        <a class="nav-link" th:href="@{/login}">Login</a>
-        <a class="nav-link" th:href="@{/register}">Register</a>
-    </th:block>
-
-    <th:block th:if="${currentUser != null}">
-
-        <!-- Patient -->
-        <th:block th:if="${currentUser.role.name() == 'PATIENT'}">
-            <a class="nav-link" th:href="@{/patient/dashboard}">Dashboard</a>
-            <a class="nav-link" th:href="@{/patient/doctors}">Find a Doctor</a>
-            <a class="nav-link" th:href="@{/patient/appointments/book}">Book</a>
-            <a class="nav-link" th:href="@{/patient/appointments}">My Appointments</a>
-            <a class="nav-link" th:href="@{/patient/video}">Online</a>
-            <a class="nav-link" th:href="@{/patient/records}">My Records</a>
-            <a class="nav-link" th:href="@{/patient/feedback}">Feedback</a>
+        <th:block th:if="${currentUser == null}">
+            <a class="nav-link" th:href="@{/login}">Login</a>
+            <a class="nav-link" th:href="@{/register}">Register</a>
         </th:block>
 
-        <!-- Doctor -->
-        <th:block th:if="${currentUser.role.name() == 'DOCTOR'}">
-            <a class="nav-link" th:href="@{/doctor/dashboard}">My Queue</a>
-            <a class="nav-link" th:href="@{/doctor/appointments}">Appointments</a>
-            <a class="nav-link" th:href="@{/doctor/consultations}">Consultations</a>
-            <a class="nav-link" th:href="@{/doctor/video}">Online Sessions</a>
-            <a class="nav-link" th:href="@{/doctor/feedback}">My Ratings</a>
-        </th:block>
+        <th:block th:if="${currentUser != null}">
 
-        <!-- Receptionist -->
-        <th:block th:if="${currentUser.role.name() == 'RECEPTIONIST'}">
-            <a class="nav-link" th:href="@{/reception/dashboard}">Dashboard</a>
-            <a class="nav-link" th:href="@{/reception/appointments}">Appointments</a>
-            <a class="nav-link" th:href="@{/reception/patients}">Patients</a>
-        </th:block>
+            <!-- Patient -->
+            <th:block th:if="${currentUser.role.name() == 'PATIENT'}">
+                <a class="nav-link" th:href="@{/patient/dashboard}">Dashboard</a>
+                <a class="nav-link" th:href="@{/patient/doctors}">Find a Doctor</a>
+                <a class="nav-link" th:href="@{/patient/appointments/book}">Book</a>
+                <a class="nav-link" th:href="@{/patient/appointments}">My Appointments</a>
+                <a class="nav-link" th:href="@{/patient/video}">Online</a>
+                <a class="nav-link" th:href="@{/patient/records}">My Records</a>
+                <a class="nav-link" th:href="@{/patient/feedback}">Feedback</a>
+            </th:block>
 
-        <!-- Pharmacist -->
-        <th:block th:if="${currentUser.role.name() == 'PHARMACIST'}">
-            <a class="nav-link" th:href="@{/pharmacy/dashboard}">Dashboard</a>
-            <a class="nav-link" th:href="@{/pharmacy/prescriptions}">Prescriptions</a>
-            <a class="nav-link" th:href="@{/pharmacy/medicines}">Inventory</a>
-        </th:block>
+            <!-- Doctor -->
+            <th:block th:if="${currentUser.role.name() == 'DOCTOR'}">
+                <a class="nav-link" th:href="@{/doctor/dashboard}">My Queue</a>
+                <a class="nav-link" th:href="@{/doctor/appointments}">Appointments</a>
+                <a class="nav-link" th:href="@{/doctor/consultations}">Consultations</a>
+                <a class="nav-link" th:href="@{/doctor/video}">Online Sessions</a>
+                <a class="nav-link" th:href="@{/doctor/feedback}">My Ratings</a>
+            </th:block>
 
-        <!-- Patient Relations Officer -->
-        <th:block th:if="${currentUser.role.name() == 'PATIENT_RELATIONS_OFFICER'}">
-            <a class="nav-link" th:href="@{/support/dashboard}">Dashboard</a>
-            <a class="nav-link" th:href="@{/support/feedback}">Feedback</a>
-        </th:block>
+            <!-- Receptionist -->
+            <th:block th:if="${currentUser.role.name() == 'RECEPTIONIST'}">
+                <a class="nav-link" th:href="@{/reception/dashboard}">Dashboard</a>
+                <a class="nav-link" th:href="@{/reception/appointments}">Appointments</a>
+                <a class="nav-link" th:href="@{/reception/patients}">Patients</a>
+            </th:block>
 
-        <!-- Hospital Administrator -->
-        <th:block th:if="${currentUser.role.name() == 'ADMIN'}">
-            <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
-            <a class="nav-link" th:href="@{/admin/staff}">Staff</a>
-            <a class="nav-link" th:href="@{/admin/patients}">Patients</a>
-            <a class="nav-link" th:href="@{/reception/appointments}">Appointments</a>
-            <a class="nav-link" th:href="@{/admin/reports/appointments}">Appt. Report</a>
-            <a class="nav-link" th:href="@{/admin/reports/feedback}">Feedback Report</a>
-        </th:block>
+            <!-- Pharmacist -->
+            <th:block th:if="${currentUser.role.name() == 'PHARMACIST'}">
+                <a class="nav-link" th:href="@{/pharmacy/dashboard}">Dashboard</a>
+                <a class="nav-link" th:href="@{/pharmacy/prescriptions}">Prescriptions</a>
+                <a class="nav-link" th:href="@{/pharmacy/medicines}">Inventory</a>
+            </th:block>
 
-        <span class="spacer"></span>
-        <span class="who">
-            <strong th:text="${currentUser.fullName}">Name</strong>
-            &middot; <span th:text="${currentUser.roleLabel}">Role</span>
-        </span>
-        <a class="nav-link" th:href="@{/profile}">Profile</a>
-        <a class="nav-link" th:href="@{/logout}">Logout</a>
-    </th:block>
-</nav>
+            <!-- Patient Relations Officer -->
+            <th:block th:if="${currentUser.role.name() == 'PATIENT_RELATIONS_OFFICER'}">
+                <a class="nav-link" th:href="@{/support/dashboard}">Dashboard</a>
+                <a class="nav-link" th:href="@{/support/feedback}">Feedback</a>
+            </th:block>
+
+            <!-- Hospital Administrator -->
+            <th:block th:if="${currentUser.role.name() == 'ADMIN'}">
+                <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+                <a class="nav-link" th:href="@{/admin/staff}">Staff</a>
+                <a class="nav-link" th:href="@{/admin/patients}">Patients</a>
+                <a class="nav-link" th:href="@{/reception/appointments}">Appointments</a>
+                <a class="nav-link" th:href="@{/admin/reports/appointments}">Appt. Report</a>
+                <a class="nav-link" th:href="@{/admin/reports/feedback}">Feedback Report</a>
+            </th:block>
+
+            <span class="spacer"></span>
+            <span class="who">
+                <strong th:text="${currentUser.fullName}">Name</strong>
+                &middot; <span th:text="${currentUser.roleLabel}">Role</span>
+            </span>
+            <a class="nav-link" th:href="@{/profile}">Profile</a>
+            <a class="nav-link" th:href="@{/logout}">Logout</a>
+        </th:block>
+    </nav>
+</div>
 
 <!-- Flash / error messages, shown at the top of every page -->
-<div th:fragment="messages">
+<div th:fragment="messages" class="container">
     <div class="alert success" th:if="${success}" th:text="${success}"></div>
     <div class="alert error" th:if="${error}" th:text="${error}"></div>
 </div>
 
 <div th:fragment="footer" class="footer">
-    HealthConnect &middot; Web-Based Medical Portal &middot;
-    SE2030 Software Engineering Group Project &middot; Group 2026-Y2-S1-MLB-WEB3G1-07
+    <footer>
+        HealthConnect &middot; Web-Based Medical Portal &middot;
+        SE2030 Software Engineering Group Project
+    </footer>
 </div>
 
 </body>

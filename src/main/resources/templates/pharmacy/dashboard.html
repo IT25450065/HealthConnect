@@ -5,35 +5,43 @@
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <div class="container">
-    <div class="page-head"><h1>Pharmacy dashboard</h1></div>
+    <div class="page-head">
+        <div>
+            <h1>Pharmacy Dashboard</h1>
+            <p class="muted">Overview of prescription dispensing queue and inventory health</p>
+        </div>
+        <div>
+            <a class="btn" th:href="@{/pharmacy/medicines/new}">+ Add Medicine</a>
+        </div>
+    </div>
     <div th:replace="~{fragments/layout :: messages}"></div>
 
     <div class="stat-row">
         <div class="stat amber">
             <div class="value" th:text="${pendingCount}">0</div>
-            <div class="label">Prescriptions waiting</div>
+            <div class="label">Prescriptions Waiting</div>
         </div>
         <div class="stat">
             <div class="value" th:text="${dispensedCount}">0</div>
-            <div class="label">Dispensed to date</div>
+            <div class="label">Dispensed to Date</div>
         </div>
         <div class="stat danger">
             <div class="value" th:text="${lowStock.size()}">0</div>
-            <div class="label">Medicines at or below reorder level</div>
+            <div class="label">Low Stock Items</div>
         </div>
     </div>
 
     <div class="alert error" th:unless="${lowStock.isEmpty()}">
-        <strong>Low stock alert.</strong>
+        <strong>Low stock alert: </strong>
         <span th:each="m, s : ${lowStock}">
             <span th:text="${m.label}">name</span>
             (<span th:text="${m.stockQuantity}">0</span> left)<span th:unless="${s.last}">, </span>
         </span>
-        &mdash; <a th:href="@{/pharmacy/medicines}">update the inventory</a>.
+        &mdash; <a th:href="@{/pharmacy/medicines}">Update inventory</a>
     </div>
 
     <div class="card">
-        <h2>Prescriptions waiting to be dispensed</h2>
+        <h2>Prescriptions Waiting to be Dispensed</h2>
         <div th:if="${pending.isEmpty()}" class="empty">Nothing is waiting. The queue is clear.</div>
 
         <div class="table-wrap" th:unless="${pending.isEmpty()}">
@@ -42,7 +50,7 @@
                 <tr>
                     <th>Issued</th>
                     <th>Patient</th>
-                    <th>Prescribed by</th>
+                    <th>Prescribed By</th>
                     <th class="num">Items</th>
                     <th></th>
                 </tr>
@@ -53,7 +61,7 @@
                     <td th:text="${p.patient.fullName}">patient</td>
                     <td th:text="${p.doctor.fullName}">doctor</td>
                     <td class="num" th:text="${p.items.size()}">0</td>
-                    <td><a class="btn small" th:href="@{'/pharmacy/prescriptions/' + ${p.id}}">Open</a></td>
+                    <td style="text-align: right;"><a class="btn small" th:href="@{'/pharmacy/prescriptions/' + ${p.id}}">Open</a></td>
                 </tr>
                 </tbody>
             </table>
