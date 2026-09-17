@@ -350,6 +350,18 @@ a:hover {
     color: #c0261d;
 }
 
+.alert.info {
+    background: rgba(0, 113, 227, 0.08);
+    border: 1px solid rgba(0, 113, 227, 0.2);
+    color: #005bb5;
+}
+
+.alert.warn {
+    background: rgba(255, 149, 0, 0.1);
+    border: 1px solid rgba(255, 149, 0, 0.25);
+    color: #a85200;
+}
+
 /* ------------------------------ Tables ------------------------------ */
 
 .table-wrap {
@@ -498,6 +510,139 @@ input:focus, select:focus, textarea:focus {
     text-align: center;
     color: var(--apple-text-secondary);
     font-size: 16px;
+}
+
+/* ------------------------------ Authentication Pages (Login, Register, Reset) ------------------------------ */
+
+.auth-wrap {
+    max-width: 440px;
+    margin: 40px auto;
+    padding: 0 16px;
+}
+
+.auth-wrap.wide {
+    max-width: 760px;
+}
+
+.auth-brand {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.auth-brand .logo {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--apple-text-primary);
+}
+
+.auth-brand .logo span {
+    color: var(--apple-blue);
+}
+
+.auth-brand .tag {
+    font-size: 15px;
+    color: var(--apple-text-secondary);
+    margin-top: 4px;
+}
+
+.auth-wrap .card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--border-glass);
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    padding: 36px 32px;
+    margin-bottom: 24px;
+}
+
+.auth-wrap .card h2 {
+    font-size: 26px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.auth-wrap .form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.auth-wrap .form-actions .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.auth-wrap .form-actions .btn.secondary {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--apple-text-primary) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: none;
+}
+
+.auth-wrap .form-actions .btn.secondary:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--apple-text-primary) !important;
+}
+
+.auth-link-row {
+    text-align: center;
+    margin-top: 16px;
+}
+
+.auth-link-row a {
+    font-size: 14px;
+    color: var(--apple-blue);
+    font-weight: 500;
+}
+
+.demo-box {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    padding: 20px 24px;
+    font-size: 13px;
+    color: var(--apple-text-secondary);
+}
+
+.demo-box strong {
+    color: var(--apple-text-primary);
+    font-weight: 600;
+}
+
+.demo-box table {
+    margin-top: 12px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.demo-box td {
+    padding: 8px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.demo-box td:first-child {
+    font-weight: 600;
+    color: var(--apple-text-primary);
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.demo-box td:last-child {
+    text-align: right;
+    color: var(--apple-text-secondary);
+}
+
+.demo-box tr:last-child td {
+    border-bottom: none;
 }
 
 /* ------------------------------ Footer ------------------------------ */

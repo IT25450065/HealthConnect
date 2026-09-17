@@ -15,30 +15,32 @@
     <div class="alert warn" th:if="${param.required}">Please log in to continue.</div>
 
     <div class="card">
-        <h2>Sign in</h2>
+        <h2>Sign In</h2>
         <form th:action="@{/login}" th:object="${loginForm}" method="post">
             <div class="form-row">
-                <label for="email">Email address</label>
-                <input type="email" id="email" th:field="*{email}" autofocus>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" th:field="*{email}" placeholder="e.g. pharmacy@healthconnect.lk" autofocus>
                 <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
             </div>
             <div class="form-row">
                 <label for="password">Password</label>
-                <input type="password" id="password" th:field="*{password}">
+                <input type="password" id="password" th:field="*{password}" placeholder="Enter your password">
                 <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
             </div>
             <div class="form-actions">
-                <button class="btn" type="submit">Log in</button>
-                <a class="btn secondary" th:href="@{/register}">Register as a patient</a>
+                <button class="btn" type="submit">Log In</button>
+                <a class="btn secondary" th:href="@{/register}">Register as a Patient</a>
             </div>
         </form>
-        <p class="small" style="margin-bottom:0">
+        <div class="auth-link-row">
             <a th:href="@{/forgot-password}">Forgotten your password?</a>
-        </p>
+        </div>
     </div>
 
     <div class="demo-box">
-        <strong>Demo accounts</strong> &mdash; password for all of them is <code>health123</code>
+        <div style="margin-bottom: 8px;">
+            <strong>Demo Accounts</strong> &mdash; password for all accounts is <code>health123</code>
+        </div>
         <table>
             <tr><td>admin@healthconnect.lk</td><td>Hospital Administrator</td></tr>
             <tr><td>cardiology@healthconnect.lk</td><td>Doctor</td></tr>
