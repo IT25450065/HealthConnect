@@ -209,4 +209,16 @@ public class PharmacyService {
     public long countDispensed() {
         return prescriptionRepository.countByStatus(PrescriptionStatus.DISPENSED);
     }
+
+    @Transactional(readOnly = true)
+    public long countTotalMedicines() {
+        return medicineRepository.count();
+    }
+
+    @Transactional(readOnly = true)
+    public long countOutOfStock() {
+        return medicineRepository.findAll().stream()
+                .filter(m -> m.getStockQuantity() <= 0)
+                .count();
+    }
 }

@@ -41,6 +41,8 @@ public class PharmacyController {
         model.addAttribute("lowStock", pharmacyService.findLowStock());
         model.addAttribute("pendingCount", pharmacyService.countPending());
         model.addAttribute("dispensedCount", pharmacyService.countDispensed());
+        model.addAttribute("totalMedicinesCount", pharmacyService.countTotalMedicines());
+        model.addAttribute("outOfStockCount", pharmacyService.countOutOfStock());
         return "pharmacy/dashboard";
     }
 
