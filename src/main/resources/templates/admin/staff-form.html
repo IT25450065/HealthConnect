@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Staff account')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head">
+        <h1 th:text="${creating} ? 'Add a staff account' : 'Edit staff account'">Staff account</h1>
+        <a class="btn secondary" th:href="@{/admin/staff}">Back to staff list</a>
+    </div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="card">
+        <form th:action="@{/admin/staff/save}" th:object="${staffForm}" method="post">
+            <input type="hidden" th:field="*{userId}">
+
+            <div class="grid-2">
+                <div class="form-row">
+                    <label for="fullName">Full name *</label>
+                    <input type="text" id="fullName" th:field="*{fullName}">
+                    <div class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                </div>
+                <div class="form-row">
+                    <label for="email">Email address *</label>
+                    <input type="email" id="email" th:field="*{email}">
+                    <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+                <div class="form-row">
+                    <label for="phone">Phone number</label>
+                    <input type="text" id="phone" th:field="*{phone}">
+                    <div class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                </div>
+                <div class="form-row">
+                    <label for="role">Role *</label>
+                    <select id="role" th:field="*{role}" th:if="${creating}">
+                        <option th:each="r : ${roles}" th:value="${r}" th:text="${r.displayName}">role</option>
+                    </select>
+                    <th:block th:unless="${creating}">
+                        <input type="text" th:value="${staffForm.role.displayName}" readonly>
+                        <input type="hidden" th:field="*{role}">
+                        <div class="small muted">The role of an existing account cannot be changed.</div>
+                    </th:block>
+                    <div class="field-error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+                </div>
+                <div class="form-row">
+                    <label for="password"
+                           th:text="${creating} ? 'Starting password *' : 'New password (leave blank to keep the current one)'">
+                        Password</label>
+                    <input type="password" id="password" th:field="*{password}">
+                </div>
+                <div class="form-row">
+                    <label for="active">Account status</label>
+                    <select id="active" th:field="*{active}">
+                        <option value="true">Active</option>
+                        <option value="false">Deactivated</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Doctor-only section. Ignored by AdminService unless the role is DOCTOR. -->
+            <h3>Doctor details</h3>
+            <p class="muted small">These fields only apply when the role is Doctor.</p>
+
+            <div class="grid-3">
+                <div class="form-row">
+                    <label for="specialization">Specialization</label>
+                    <input type="text" id="specialization" th:field="*{specialization}" placeholder="Cardiology">
+                    <div class="field-error" th:if="${#fields.hasErrors('specialization')}" th:errors="*{specialization}"></div>
+                </div>
+                <div class="form-row">
+                    <label for="qualification">Qualification</label>
+                    <input type="text" id="qualification" th:field="*{qualification}" placeholder="MBBS, MD">
+                    <div class="field-error" th:if="${#fields.hasErrors('qualification')}" th:errors="*{qualification}"></div>
+                </div>
+                <div class="form-row">
+                    <label for="roomNo">Room number</label>
+                    <input type="text" id="roomNo" th:field="*{roomNo}" placeholder="C-102">
+                    <div class="field-error" th:if="${#fields.hasErrors('roomNo')}" th:errors="*{roomNo}"></div>
+                </div>
+                <div class="form-row">
+                    <label for="availableFrom">Available from</label>
+                    <input type="time" id="availableFrom" th:field="*{availableFrom}">
+                </div>
+                <div class="form-row">
+                    <label for="availableTo">Available to</label>
+                    <input type="time" id="availableTo" th:field="*{availableTo}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label>Available days</label>
+                <div class="checkbox-row">
+                    <label th:each="day : ${allDays}">
+                        <input type="checkbox" th:field="*{availableDays}" th:value="${day.name()}">
+                        <span th:text="${day}">MONDAY</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn" type="submit">Save account</button>
+                <a class="btn secondary" th:href="@{/admin/staff}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
