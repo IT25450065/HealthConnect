@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Consultation')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head">
+        <h1>Consultation</h1>
+        <a class="btn secondary" th:href="@{/doctor/consultations}">Back to list</a>
+    </div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="card">
+        <h2 th:text="${consultation.patient.fullName}">patient</h2>
+        <p class="muted small">
+            <span th:text="${consultation.dateTimeLabel}">date</span> &middot;
+            <span th:text="${consultation.appointment.type.displayName}">type</span> visit &middot;
+            appointment booked for <span th:text="${consultation.appointment.dateTimeLabel}">date</span>
+        </p>
+
+        <p><strong>Symptoms:</strong> <span th:text="${consultation.symptoms}">symptoms</span></p>
+        <p><strong>Diagnosis:</strong> <span th:text="${consultation.diagnosis}">diagnosis</span></p>
+        <p><strong>Notes:</strong> <span th:text="${consultation.notes}">notes</span></p>
+
+        <p>
+            <a class="btn small secondary"
+               th:href="@{'/doctor/patients/' + ${consultation.patient.id} + '/history'}">
+                View this patient's full history
+            </a>
+        </p>
+    </div>
+
+    <div class="card" th:each="p : ${consultation.prescriptions}">
+        <div class="page-head">
+            <h3>Prescription</h3>
+            <span class="badge" th:classappend="${p.status.name()}" th:text="${p.status.displayName}">status</span>
+        </div>
+        <p class="muted small" style="margin-top:-8px">
+            Issued <span th:text="${p.issuedLabel}">date</span>
+            <span th:if="${p.dispensedAt != null}">
+                &middot; dispensed <span th:text="${p.dispensedLabel}">date</span>
+                <span th:if="${p.dispensedBy != null}" th:text="'by ' + ${p.dispensedBy.fullName}"></span>
+            </span>
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Dosage</th>
+                    <th>Instructions</th>
+                    <th class="num">Quantity</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="i : ${p.items}">
+                    <td th:text="${i.medicine.label}">medicine</td>
+                    <td th:text="${i.dosage}">dosage</td>
+                    <td th:text="${i.instructions}">instructions</td>
+                    <td class="num" th:text="${i.quantity}">0</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="empty" th:if="${consultation.prescriptions.isEmpty()}">
+        No prescription was issued for this consultation.
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Doctor dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head">
+        <h1>My patient queue</h1>
+        <span class="badge" th:text="${doctor.specialization}">spec</span>
+    </div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="stat-row">
+        <div class="stat">
+            <div class="value" th:text="${queue.size()}">0</div>
+            <div class="label">Waiting to be seen</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${consultationCount}">0</div>
+            <div class="label">Consultations recorded</div>
+        </div>
+        <div class="stat amber">
+            <div class="value"
+                 th:text="${averageRating != null} ? ${#numbers.formatDecimal(averageRating, 1, 2)} : '-'">-</div>
+            <div class="label">Average rating</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${feedbackCount}">0</div>
+            <div class="label">Feedback received</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Appointments waiting</h2>
+        <p class="muted small">
+            Open a patient's history before starting the consultation &mdash; that is the
+            "View Patient Medical History" include from UC-02.
+        </p>
+
+        <div th:if="${queue.isEmpty()}" class="empty">Nothing in your queue right now.</div>
+
+        <div class="table-wrap" th:unless="${queue.isEmpty()}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Date and time</th>
+                    <th>Patient</th>
+                    <th>Type</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${queue}">
+                    <td th:text="${a.dateTimeLabel}">date</td>
+                    <td th:text="${a.patient.fullName}">patient</td>
+                    <td><span class="badge" th:classappend="${a.type.name()}" th:text="${a.type.displayName}">type</span></td>
+                    <td th:text="${a.reason}">reason</td>
+                    <td><span class="badge" th:classappend="${a.status.name()}" th:text="${a.status.displayName}">status</span></td>
+                    <td>
+                        <a class="btn small secondary"
+                           th:href="@{'/doctor/patients/' + ${a.patient.id} + '/history'}">History</a>
+                        <a class="btn small"
+                           th:href="@{/doctor/consultation/new(appointmentId=${a.id})}">Start consultation</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
