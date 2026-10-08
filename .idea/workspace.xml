@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="919bafc6-fe0d-4c35-850d-3d9a482b64d0" name="Changes" comment="" />
+    <list default="true" id="919bafc6-fe0d-4c35-850d-3d9a482b64d0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/healthconnect/controller/ConsultationController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/healthconnect/dto/ConsultationForm.java" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
