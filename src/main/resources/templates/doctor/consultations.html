@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My consultations')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head"><h1>Consultations I have recorded</h1></div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div th:if="${consultations.isEmpty()}" class="empty">You have not recorded any consultations yet.</div>
+
+    <div class="table-wrap" th:unless="${consultations.isEmpty()}">
+        <table>
+            <thead>
+            <tr>
+                <th>Date and time</th>
+                <th>Patient</th>
+                <th>Diagnosis</th>
+                <th class="num">Prescriptions</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${consultations}">
+                <td th:text="${c.dateTimeLabel}">date</td>
+                <td th:text="${c.patient.fullName}">patient</td>
+                <td th:text="${c.diagnosis}">diagnosis</td>
+                <td class="num" th:text="${c.prescriptions.size()}">0</td>
+                <td>
+                    <a class="btn small secondary" th:href="@{'/doctor/consultations/' + ${c.id}}">Open</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

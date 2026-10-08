@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Staff accounts')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head">
+        <h1>Doctor and staff accounts</h1>
+        <a class="btn" th:href="@{/admin/staff/new}">Add a staff account</a>
+    </div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div th:if="${staff.isEmpty()}" class="empty">No staff accounts have been created yet.</div>
+
+    <div class="table-wrap" th:unless="${staff.isEmpty()}">
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Account</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${staff}">
+                <td th:text="${u.fullName}">name</td>
+                <td th:text="${u.email}">email</td>
+                <td th:text="${u.phone}">phone</td>
+                <td th:text="${u.role.displayName}">role</td>
+                <td>
+                    <span class="badge ok" th:if="${u.active}">Active</span>
+                    <span class="badge CANCELLED" th:unless="${u.active}">Deactivated</span>
+                </td>
+                <td>
+                    <a class="btn small secondary" th:href="@{'/admin/staff/' + ${u.id} + '/edit'}">Edit</a>
+                    <form class="inline-form" method="post" th:action="@{'/admin/staff/' + ${u.id} + '/active'}">
+                        <input type="hidden" name="active" th:value="${u.active} ? 'false' : 'true'">
+                        <button class="btn small" th:classappend="${u.active} ? 'danger' : ''" type="submit"
+                                th:text="${u.active} ? 'Deactivate' : 'Re-activate'">Deactivate</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p class="muted small">
+        Accounts are never deleted &mdash; deactivating stops the person logging in while keeping
+        their appointment and consultation history intact.
+    </p>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

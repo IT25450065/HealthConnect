@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Online sessions')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head"><h1>My online consultation sessions</h1></div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="alert warn">
+        <strong>Project scope note.</strong> Live video calling is outside the scope of this
+        project. A session is a scheduled record with a placeholder meeting link; the buttons
+        below move it through its Scheduled &rarr; In Progress &rarr; Completed lifecycle.
+    </div>
+
+    <div th:if="${sessions.isEmpty()}" class="empty">No online consultations are booked with you.</div>
+
+    <div class="table-wrap" th:unless="${sessions.isEmpty()}">
+        <table>
+            <thead>
+            <tr>
+                <th>Scheduled for</th>
+                <th>Patient</th>
+                <th>Meeting link</th>
+                <th>Session status</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${sessions}">
+                <td th:text="${s.scheduledLabel}">date</td>
+                <td th:text="${s.patient.fullName}">patient</td>
+                <td class="small" th:text="${s.meetingLink}">link</td>
+                <td><span class="badge" th:classappend="${s.status.name()}" th:text="${s.status.displayName}">status</span></td>
+                <td>
+                    <form th:if="${s.status.name() == 'SCHEDULED'}" class="inline-form" method="post"
+                          th:action="@{'/doctor/video/' + ${s.id} + '/start'}">
+                        <button class="btn small" type="submit">Start</button>
+                    </form>
+                    <form th:if="${s.status.name() == 'IN_PROGRESS'}" class="inline-form" method="post"
+                          th:action="@{'/doctor/video/' + ${s.id} + '/complete'}">
+                        <button class="btn small" type="submit">Mark completed</button>
+                    </form>
+                    <a th:if="${s.appointment.consultation == null and s.appointment.status.name() != 'CANCELLED'}"
+                       class="btn small secondary"
+                       th:href="@{/doctor/consultation/new(appointmentId=${s.appointment.id})}">Record notes</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

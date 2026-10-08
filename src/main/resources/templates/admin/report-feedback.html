@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Feedback report')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head">
+        <h1>Feedback and ratings summary report</h1>
+        <a class="btn secondary" th:href="@{/admin/reports/appointments}">Appointments report</a>
+    </div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="alert info">
+        This report reads the same feedback rows that patients submit and that the Patient
+        Relations Officer answers &mdash; the cross-module
+        <code>&lt;&lt;include&gt;&gt;</code> from the use case diagram.
+    </div>
+
+    <div class="stat-row">
+        <div class="stat amber">
+            <div class="value" th:text="${overallAverage}">-</div>
+            <div class="label">Hospital average rating</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${totalFeedback}">0</div>
+            <div class="label">Total feedback entries</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Ratings by doctor</h2>
+        <div th:if="${rows.isEmpty()}" class="empty">There are no doctors on the system yet.</div>
+
+        <div class="table-wrap" th:unless="${rows.isEmpty()}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Doctor</th>
+                    <th>Specialization</th>
+                    <th class="num">Reviews</th>
+                    <th class="num">Average rating</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${rows}">
+                    <td th:text="${r.doctorName}">doctor</td>
+                    <td th:text="${r.specialization}">spec</td>
+                    <td class="num" th:text="${r.feedbackCount}">0</td>
+                    <td class="num" th:text="${r.averageLabel}">-</td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2">All doctors</td>
+                    <td class="num" th:text="${totalFeedback}">0</td>
+                    <td class="num" th:text="${overallAverage}">-</td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
