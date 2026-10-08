@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My online consultations')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head">
+        <h1>My online consultations</h1>
+        <a class="btn" th:href="@{/patient/video/book}">Book an online consultation</a>
+    </div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="alert warn">
+        <strong>Project scope note.</strong> Live video calling is outside the scope of this
+        project, so an online consultation is stored as a scheduled session with a placeholder
+        meeting link. The link is shown but does not open a call.
+    </div>
+
+    <div th:if="${sessions.isEmpty()}" class="empty">You have no online consultations booked.</div>
+
+    <div class="table-wrap" th:unless="${sessions.isEmpty()}">
+        <table>
+            <thead>
+            <tr>
+                <th>Scheduled for</th>
+                <th>Doctor</th>
+                <th>Specialization</th>
+                <th>Meeting link</th>
+                <th>Session status</th>
+                <th>Appointment status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${sessions}">
+                <td th:text="${s.scheduledLabel}">date</td>
+                <td th:text="${s.doctor.fullName}">doctor</td>
+                <td th:text="${s.doctor.specialization}">spec</td>
+                <td class="small" th:text="${s.meetingLink}">link</td>
+                <td><span class="badge" th:classappend="${s.status.name()}" th:text="${s.status.displayName}">status</span></td>
+                <td>
+                    <span class="badge" th:classappend="${s.appointment.status.name()}"
+                          th:text="${s.appointment.status.displayName}">status</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
