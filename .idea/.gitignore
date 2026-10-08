@@ -1,5 +1,6 @@
 # Default ignored files
 /shelf/
+**/application.properties
 /workspace.xml
 # Ignored default folder with query files
 /queries/
