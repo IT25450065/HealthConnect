@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Appointments report')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="page-head">
+        <h1>Appointments summary report</h1>
+        <a class="btn secondary" th:href="@{/admin/reports/feedback}">Feedback report</a>
+    </div>
+    <div th:replace="~{fragments/layout :: messages}"></div>
+
+    <div class="stat-row">
+        <div class="stat">
+            <div class="value" th:text="${total}">0</div>
+            <div class="label">Total appointments</div>
+        </div>
+        <div class="stat amber">
+            <div class="value" th:text="${pending}">0</div>
+            <div class="label">Pending</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${confirmed}">0</div>
+            <div class="label">Confirmed</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${completed}">0</div>
+            <div class="label">Completed</div>
+        </div>
+        <div class="stat danger">
+            <div class="value" th:text="${cancelled}">0</div>
+            <div class="label">Cancelled</div>
+        </div>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat">
+            <div class="value" th:text="${inPerson}">0</div>
+            <div class="label">In-person visits</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${video}">0</div>
+            <div class="label">Online consultations</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Breakdown by doctor</h2>
+        <div th:if="${rows.isEmpty()}" class="empty">There are no doctors on the system yet.</div>
+
+        <div class="table-wrap" th:unless="${rows.isEmpty()}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Doctor</th>
+                    <th>Specialization</th>
+                    <th class="num">Total</th>
+                    <th class="num">Pending</th>
+                    <th class="num">Confirmed</th>
+                    <th class="num">Completed</th>
+                    <th class="num">Cancelled</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${rows}">
+                    <td th:text="${r.doctorName}">doctor</td>
+                    <td th:text="${r.specialization}">spec</td>
+                    <td class="num" th:text="${r.total}">0</td>
+                    <td class="num" th:text="${r.pending}">0</td>
+                    <td class="num" th:text="${r.confirmed}">0</td>
+                    <td class="num" th:text="${r.completed}">0</td>
+                    <td class="num" th:text="${r.cancelled}">0</td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2">All doctors</td>
+                    <td class="num" th:text="${total}">0</td>
+                    <td class="num" th:text="${pending}">0</td>
+                    <td class="num" th:text="${confirmed}">0</td>
+                    <td class="num" th:text="${completed}">0</td>
+                    <td class="num" th:text="${cancelled}">0</td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
